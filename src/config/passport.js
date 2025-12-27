@@ -1,9 +1,9 @@
-// config/passport.js
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import FacebookStrategy from "passport-facebook";
-import LinkedInStrategy from "passport-linkedin-oauth2";
+import { Strategy as FacebookStrategy } from "passport-facebook";
+import { Strategy as LinkedInStrategy } from "passport-linkedin-oauth2";
 import AzureAdOAuth2Strategy from "passport-azure-ad-oauth2";
+
 import { upsertSocialUser } from "../Services/AuthService.js";
 
 /**
