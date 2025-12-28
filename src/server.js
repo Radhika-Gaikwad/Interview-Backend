@@ -4,7 +4,7 @@ import cors from "cors";
 import cookieSession from "cookie-session";
 
 import connectDB from "./config/db.js";
-import passport from "./config/passport.js";
+
 import authRoutes from "./routes/auth.routes.js";
 
 // Load environment variables
@@ -38,9 +38,6 @@ app.use(
   })
 );
 
-// Initialize passport (NO session persistence)
-app.use(passport.initialize());
-// ❌ Do NOT use passport.session()
 
 // Routes
 app.use("/auth", authRoutes);
