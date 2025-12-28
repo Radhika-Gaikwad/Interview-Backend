@@ -4,11 +4,8 @@ import { Strategy as FacebookStrategy } from "passport-facebook";
 import { Strategy as LinkedInStrategy } from "passport-linkedin-oauth2";
 import AzureAdOAuth2Strategy from "passport-azure-ad-oauth2";
 
-import { upsertSocialUser } from "../Services/AuthService.js";
-
 /**
- * Convert provider profile to standardized shape:
- * { provider, providerId, email, name, avatar }
+ * Normalize provider profile to common shape
  */
 function normalizeProfile(provider, profile) {
   switch (provider) {
@@ -20,6 +17,7 @@ function normalizeProfile(provider, profile) {
         name: profile.displayName,
         avatar: profile.photos?.[0]?.value,
       };
+
     case "facebook":
       return {
         provider: "facebook",
@@ -28,6 +26,7 @@ function normalizeProfile(provider, profile) {
         name: profile.displayName,
         avatar: profile.photos?.[0]?.value,
       };
+
     case "linkedin":
       return {
         provider: "linkedin",
@@ -36,96 +35,113 @@ function normalizeProfile(provider, profile) {
         name: profile.displayName,
         avatar: profile.photos?.[0]?.value,
       };
-    case "azure_ad_oauth2":
-      return {
-        provider: "microsoft",
-        providerId: profile.id,
-        email: profile.emails?.[0]?.value || profile._json?.upn,
-        name: profile.displayName || profile._json?.name,
-        avatar: profile.photos?.[0]?.value,
-      };
+
     default:
       return null;
   }
 }
 
-/* Google */
+/* ===================== GOOGLE ===================== */
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-  passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL
-  }, async (accessToken, refreshToken, profile, cb) => {
-    try {
-      const p = normalizeProfile("google", profile);
-      // attach providerProfile to req.user by passing in cb second arg
-      cb(null, { providerProfile: p });
-    } catch (err) {
-      cb(err);
-    }
-  }));
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: process.env.GOOGLE_CALLBACK_URL,
+        proxy: true, // IMPORTANT for Render
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          const p = normalizeProfile("google", profile);
+          done(null, { providerProfile: p });
+        } catch (err) {
+          done(err);
+        }
+      }
+    )
+  );
 }
 
-/* Facebook */
+/* ===================== FACEBOOK ===================== */
 if (process.env.FACEBOOK_CLIENT_ID && process.env.FACEBOOK_CLIENT_SECRET) {
-  passport.use(new FacebookStrategy({
-    clientID: process.env.FACEBOOK_CLIENT_ID,
-    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    callbackURL: process.env.FACEBOOK_CALLBACK_URL,
-    profileFields: ['id', 'displayName', 'photos', 'email']
-  }, async (accessToken, refreshToken, profile, cb) => {
-    try {
-      const p = normalizeProfile("facebook", profile);
-      cb(null, { providerProfile: p });
-    } catch (err) { cb(err); }
-  }));
+  passport.use(
+    new FacebookStrategy(
+      {
+        clientID: process.env.FACEBOOK_CLIENT_ID,
+        clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+        callbackURL: process.env.FACEBOOK_CALLBACK_URL,
+        profileFields: ["id", "displayName", "photos", "email"],
+        scope: ["email"], // REQUIRED
+        proxy: true,
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          const p = normalizeProfile("facebook", profile);
+          done(null, { providerProfile: p });
+        } catch (err) {
+          done(err);
+        }
+      }
+    )
+  );
 }
 
-/* LinkedIn */
+/* ===================== LINKEDIN (OPENID) ===================== */
 if (process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET) {
-  passport.use(new LinkedInStrategy({
-    clientID: process.env.LINKEDIN_CLIENT_ID,
-    clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
-    callbackURL: process.env.LINKEDIN_CALLBACK_URL,
-    scope: ['r_emailaddress', 'r_liteprofile'],
-    state: true
-  }, async (accessToken, refreshToken, profile, cb) => {
-    try {
-      const p = normalizeProfile("linkedin", profile);
-      cb(null, { providerProfile: p });
-    } catch (err) { cb(err); }
-  }));
+  passport.use(
+    new LinkedInStrategy(
+      {
+        clientID: process.env.LINKEDIN_CLIENT_ID,
+        clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+        callbackURL: process.env.LINKEDIN_CALLBACK_URL,
+        scope: ["openid", "profile", "email"], // FIXED (new LinkedIn)
+        state: true,
+        proxy: true,
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          const p = normalizeProfile("linkedin", profile);
+          done(null, { providerProfile: p });
+        } catch (err) {
+          done(err);
+        }
+      }
+    )
+  );
 }
 
-/* Microsoft / Azure AD OAuth2 */
+/* ===================== MICROSOFT / AZURE AD ===================== */
 if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
-  passport.use('azure_ad_oauth2', new AzureAdOAuth2Strategy({
-    clientID: process.env.MICROSOFT_CLIENT_ID,
-    clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
-    callbackURL: process.env.MICROSOFT_CALLBACK_URL
-  }, async (accessToken, refreshToken, params, profile, cb) => {
-    // Azure strategy often needs additional userinfo fetch using accessToken
-    // For demo-simple approach we can parse id_token if present
-    try {
-      const idToken = params.id_token;
-      // decode id_token if you want, or fetch /userinfo endpoint.
-      // For simplicity, put minimal profile:
-      const p = {
-        provider: "microsoft",
-        providerId: params.oid || params.sub || Date.now().toString(),
-        email: params.upn || params.preferred_username,
-        name: params.name || params.preferred_username,
-        avatar: null
-      };
-      cb(null, { providerProfile: p });
-    } catch (err) { cb(err); }
-  }));
+  passport.use(
+    "azure_ad_oauth2",
+    new AzureAdOAuth2Strategy(
+      {
+        clientID: process.env.MICROSOFT_CLIENT_ID,
+        clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
+        callbackURL: process.env.MICROSOFT_CALLBACK_URL,
+        scope: ["openid", "profile", "email"],
+        proxy: true,
+      },
+      async (accessToken, refreshToken, params, done) => {
+        try {
+          const p = {
+            provider: "microsoft",
+            providerId: params.oid || params.sub,
+            email: params.preferred_username,
+            name: params.name || params.preferred_username,
+            avatar: null,
+          };
+          done(null, { providerProfile: p });
+        } catch (err) {
+          done(err);
+        }
+      }
+    )
+  );
 }
 
-/**
- * When passport returns a user object, we just forward it to next middleware:
- * we don't persist passport sessions (session: false in routes).
- */
+/* ===================== PASSPORT BOILERPLATE ===================== */
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
