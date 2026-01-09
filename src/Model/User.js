@@ -1,23 +1,65 @@
-// models/User.js
 import mongoose from "mongoose";
 
-const socialSchema = new mongoose.Schema({
-  provider: String, // 'google' | 'facebook' | 'linkedin' | 'microsoft' etc.
-  id: String,
-  email: String,
-  name: String,
-  avatar: String,
-});
+const UserSchema = new mongoose.Schema(
+  {
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-const userSchema = new mongoose.Schema({
-  name: { type: String },
-  email: { type: String, unique: true, sparse: true, lowercase: true, trim: true },
-  password: { type: String }, // hashed password for local auth
-  role: { type: String, default: "user" },
-  resumeUrl: { type: String },
-  socials: [socialSchema], // store multiple provider records
-  createdAt: { type: Date, default: Date.now },
-});
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      index: true,
+    },
 
-const User = mongoose.model("User", userSchema);
-export default User;
+    password: {
+      type: String,
+      required: function () {
+        return this.authProvider === "local";
+      },
+    },
+
+    role: {
+      type: String,
+      enum: ["Student", "Job Seeker", "Working Professional", "HR / Recruiter"],
+      default: "Job Seeker",
+    },
+
+    resumeUrl: {
+      type: String,
+    },
+
+    authProvider: {
+      type: String,
+      enum: ["local", "google", "linkedin", "facebook", "microsoft"],
+      default: "local",
+    },
+
+    authProviderId: {
+      type: String, // sub from Auth0
+    },
+
+    onboardingCompleted: {
+      type: Boolean,
+      default: false,
+    },
+
+    interviewStats: {
+      sessionsTaken: { type: Number, default: 0 },
+      averageScore: { type: Number, default: 0 },
+    },
+
+    credits: {
+  type: Number,
+  default: 0,
+},
+
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("User", UserSchema);

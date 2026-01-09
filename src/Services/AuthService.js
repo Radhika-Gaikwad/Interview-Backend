@@ -1,72 +1,100 @@
-// services/authService.js
-import User from "../Model/User.js";
 import bcrypt from "bcryptjs";
-
-const SALT_ROUNDS = 10;
-
-export async function createUser({ name, email, password, role, resumeUrl }) {
-  if (!email) throw new Error("Email required");
-  const existing = await User.findOne({ email: email.toLowerCase() });
-  if (existing) throw new Error("User already exists");
-
-  const hashed = password ? await bcrypt.hash(password, SALT_ROUNDS) : undefined;
-
-  const user = new User({
-    name,
-    email,
-    password: hashed,
-    role,
-    resumeUrl,
-  });
-
-  await user.save();
-  return user;
-}
-
-export async function validatePassword(email, plainPassword) {
-  const user = await User.findOne({ email: email.toLowerCase() });
-  if (!user || !user.password) return null;
-  const ok = await bcrypt.compare(plainPassword, user.password);
-  return ok ? user : null;
-}
-
-export async function findUserByEmail(email) {
-  return User.findOne({ email: email?.toLowerCase() });
-}
-
-export async function findUserById(id) {
-  return User.findById(id);
-}
+import User from "../Model/User.js";
 
 /**
- * Upsert a social login entry:
- * - If a user with the social provider id exists -> return user
- * - Else if a user with same email exists -> attach social entry and return user
- * - Else create new user with that social info
+ * Register with email + password
  */
-export async function upsertSocialUser({ provider, providerId, email, name, avatar }) {
-  // 1) find by provider id
-  let user = await User.findOne({ "socials.provider": provider, "socials.id": providerId });
-
-  if (user) return user;
-
-  // 2) find by email -> attach provider
-  if (email) {
-    user = await User.findOne({ email: email.toLowerCase() });
-    if (user) {
-      user.socials.push({ provider, id: providerId, email: email.toLowerCase(), name, avatar });
-      await user.save();
-      return user;
-    }
+const registerUser = async (data) => {
+  const existingUser = await User.findOne({ email: data.email });
+  if (existingUser) {
+    throw new Error("Email already registered");
   }
 
-  // 3) create new user
-  const newUser = new User({
-    name,
-    email: email?.toLowerCase(),
-    socials: [{ provider, id: providerId, email: email?.toLowerCase(), name, avatar }],
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+
+  const user = await User.create({
+    fullName: data.fullName,
+    email: data.email,
+    password: hashedPassword,
+    role: data.role || "Job Seeker",
+    authProvider: "local",
   });
 
-  await newUser.save();
-  return newUser;
-}
+  return user;
+};
+
+/**
+ * Login with email + password
+ */
+const loginUser = async (email, password) => {
+  const user = await User.findOne({ email });
+  if (!user || user.authProvider !== "local") {
+    throw new Error("Invalid credentials");
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new Error("Invalid credentials");
+  }
+
+  return user;
+};
+
+/**
+ * Normalize provider from Auth0
+ */
+const normalizeProvider = (provider) => {
+  if (!provider) return "local";
+  const p = provider.toLowerCase();
+
+  if (p.includes("google")) return "google";
+  if (p.includes("facebook")) return "facebook";
+  if (p.includes("linkedin")) return "linkedin";
+  if (p.includes("microsoft")) return "microsoft";
+
+  return "local";
+};
+
+/**
+ * Social login (Google, LinkedIn, Microsoft, etc.)
+ */
+const socialLogin = async ({ email, name, provider, providerId }) => {
+  if (!email) {
+    throw new Error("Email is required for social login");
+  }
+
+  const authProvider = normalizeProvider(provider);
+
+  let user = await User.findOne({ email });
+
+  // 🔹 First-time social login
+  if (!user) {
+    user = await User.create({
+      email,
+      fullName: name || email.split("@")[0], // ✅ REQUIRED FIELD SAFE
+      role: "Job Seeker",                    // ✅ HARD-CODE DEFAULT ROLE
+      authProvider,
+      authProviderId: providerId,
+    });
+
+    return user;
+  }
+
+  // 🔹 Existing user but provider not set (edge case)
+  if (!user.authProvider || user.authProvider === "local") {
+    user.authProvider = authProvider;
+    user.authProviderId = providerId;
+    await user.save();
+  }
+
+  return user;
+};
+
+const authService = {
+  registerUser,
+  loginUser,
+  socialLogin,
+};
+
+export default authService;
+

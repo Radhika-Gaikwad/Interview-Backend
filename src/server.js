@@ -1,57 +1,42 @@
-import express from "express";
 import dotenv from "dotenv";
-import cors from "cors";
-import cookieSession from "cookie-session";
-
-import connectDB from "./config/db.js";
-
-import authRoutes from "./routes/auth.routes.js";
-
-// Load environment variables
 dotenv.config();
+import express from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
+import * as paymentController from "./controllers/payment.controller.js";
 
-// Init express
+dotenv.config();
+// Warn if critical env vars are missing (do not print secrets)
+if (!process.env.JWT_SECRET) {
+	console.error("Warning: JWT_SECRET is not set. Authentication will fail until configured.");
+} else {
+	console.log("JWT_SECRET loaded");
+}
+
 const app = express();
-
-/* ===================== IMPORTANT (RENDER FIX) ===================== */
-app.set("trust proxy", 1); // MUST be before middleware
-/* ================================================================ */
-
-// Middlewares
-app.use(
-  cors({
-    origin: true, // or your frontend URL
-    credentials: true,
-  })
-);
-
-app.use(express.json());
-
-// Cookie Session (required for OAuth state)
-app.use(
-  cookieSession({
-    name: "session",
-    keys: [process.env.SESSION_SECRET || "session_secret"],
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production", // HTTPS only in prod
-  })
-);
-
-
-// Routes
-app.use("/auth", authRoutes);
-
-// Health check
-app.get("/", (req, res) => {
-  res.send("Backend server is running 👍");
-});
-
-// Connect to DB
 connectDB();
+// Allow credentials (cookies) from the frontend origin
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+app.use(
+	cors({
+		origin: CLIENT_ORIGIN,
+		credentials: true,
+	})
+);
+app.use(express.json());
+app.use(cookieParser());
 
-// Start server
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.post(
+  "/api/webhook/stripe",
+  express.raw({ type: "application/json" }),
+  paymentController.stripeWebhook
+);
+
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server started on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
