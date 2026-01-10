@@ -31,10 +31,14 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.get("/api/test", (req, res) => {
+	res.json({ msg: "Backend is alive!" });
+});
+
 app.post(
-  "/api/webhook/stripe",
-  express.raw({ type: "application/json" }),
-  paymentController.stripeWebhook
+	"/api/webhook/stripe",
+	express.raw({ type: "application/json" }),
+	paymentController.stripeWebhook
 );
 
 
