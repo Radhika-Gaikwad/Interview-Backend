@@ -19,7 +19,7 @@ if (!process.env.JWT_SECRET) {
 const app = express();
 connectDB();
 // Allow credentials (cookies) from the frontend origin
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "https://34.54.116.200.nip.io";
 app.use(
 	cors({
 		origin: CLIENT_ORIGIN,
@@ -43,4 +43,5 @@ app.post(
 
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on port ${PORT}`));
+
