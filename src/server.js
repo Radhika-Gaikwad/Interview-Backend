@@ -19,13 +19,25 @@ if (!process.env.JWT_SECRET) {
 const app = express();
 connectDB();
 // Allow credentials (cookies) from the frontend origin
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "https://34.54.116.200.nip.io";
+const allowedOrigins = [
+  "https://interview-user.onrender.com",
+  "http://localhost:5173",
+];
+
 app.use(
-	cors({
-		origin: CLIENT_ORIGIN,
-		credentials: true,
-	})
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // allow server-to-server
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
