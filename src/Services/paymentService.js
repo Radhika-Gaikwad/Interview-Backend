@@ -14,6 +14,24 @@ function getStripe() {
 const createCheckoutSession = async ({ user, plan }) => {
   const stripe = getStripe();
 
+  const clientOrigin = process.env.CLIENT_ORIGIN;
+
+  if (!clientOrigin) {
+    console.error("❌ CLIENT_ORIGIN is missing");
+    throw new Error("CLIENT_ORIGIN is not set");
+  }
+
+  if (!clientOrigin.startsWith("http://") && !clientOrigin.startsWith("https://")) {
+    console.error("❌ Invalid CLIENT_ORIGIN:", clientOrigin);
+    throw new Error("CLIENT_ORIGIN must include http/https");
+  }
+
+  const successUrl = `${clientOrigin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
+  const cancelUrl = `${clientOrigin}/payment-cancel`;
+
+  console.log("✅ Stripe success_url:", successUrl);
+  console.log("✅ Stripe cancel_url:", cancelUrl);
+
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     customer_email: user.email,
@@ -31,8 +49,8 @@ const createCheckoutSession = async ({ user, plan }) => {
       },
     ],
 
-    success_url: `${process.env.CLIENT_ORIGIN}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.CLIENT_ORIGIN}/payment-cancel`,
+    success_url: successUrl,
+    cancel_url: cancelUrl,
 
     metadata: {
       userId: user.userId,
@@ -49,9 +67,9 @@ const createCheckoutSession = async ({ user, plan }) => {
     status: "pending",
   });
 
-  // ✅ RETURN URL, NOT ID
   return session.url;
 };
+
 
 
 const fulfillPayment = async (session) => {

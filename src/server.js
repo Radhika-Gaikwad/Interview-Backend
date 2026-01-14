@@ -8,7 +8,11 @@ import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import * as paymentController from "./controllers/payment.controller.js";
 
-dotenv.config();
+if (process.env.NODE_ENV !== "production") {
+  const dotenv = await import("dotenv");
+  dotenv.config();
+}
+
 // Warn if critical env vars are missing (do not print secrets)
 if (!process.env.JWT_SECRET) {
 	console.error("Warning: JWT_SECRET is not set. Authentication will fail until configured.");
@@ -18,14 +22,27 @@ if (!process.env.JWT_SECRET) {
 
 const app = express();
 connectDB();
-// Allow credentials (cookies) from the frontend origin
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://34.54.116.200.nip.io",
+];
+
 app.use(
-	cors({
-		origin: CLIENT_ORIGIN,
-		credentials: true,
-	})
+  cors({
+    origin: function (origin, callback) {
+      // allow REST tools, curl, server-to-server
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 

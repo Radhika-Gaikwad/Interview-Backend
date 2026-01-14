@@ -48,12 +48,14 @@ const normalizeProvider = (provider) => {
   const p = provider.toLowerCase();
 
   if (p.includes("google")) return "google";
-  if (p.includes("facebook")) return "facebook";
+  if (p.includes("github")) return "github";
   if (p.includes("linkedin")) return "linkedin";
-  if (p.includes("microsoft")) return "microsoft";
+  if (p.includes("windowslive") || p.includes("microsoft"))
+    return "microsoft";
 
   return "local";
 };
+
 
 /**
  * Social login (Google, LinkedIn, Microsoft, etc.)
@@ -69,6 +71,7 @@ const socialLogin = async ({ email, name, provider, providerId }) => {
 
   // 🔹 First-time social login
   if (!user) {
+    console.log("Creating user with provider:", authProvider);
     user = await User.create({
       email,
       fullName: name || email.split("@")[0], // ✅ REQUIRED FIELD SAFE
