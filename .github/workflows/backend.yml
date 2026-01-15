@@ -43,6 +43,7 @@ jobs:
       # 7️⃣ Deploy to GKE
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f k8s/backend-secret.yaml
+          kubectl apply -f k8s/backend-secrets.yaml
           kubectl apply -f k8s/backend-deployment.yaml
+          kubectl apply -f k8s/backend-service.yaml
           kubectl rollout status deployment/backend
