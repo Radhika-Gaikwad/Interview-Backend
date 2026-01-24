@@ -26,7 +26,7 @@ jobs:
         with:
           project_id: ${{ secrets.GKE_PROJECT }}
 
-      # 4️⃣ Install GKE auth plugin (REQUIRED)
+      # 4️⃣ Install GKE auth plugin
       - name: Install GKE auth plugin
         run: |
           gcloud components install gke-gcloud-auth-plugin --quiet
@@ -36,15 +36,15 @@ jobs:
       - name: Configure Docker
         run: gcloud auth configure-docker gcr.io --quiet
 
-      # 6️⃣ Build Docker image
+      # 6️⃣ 🔥 Build Docker image with UNIQUE tag
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} .
+          docker build -t gcr.io/${{ secrets.GKE_PROJECT }}/backend:${{ github.sha }} .
 
       # 7️⃣ Push Docker image
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
+          docker push gcr.io/${{ secrets.GKE_PROJECT }}/backend:${{ github.sha }}
 
       # 8️⃣ Connect to GKE
       - name: Get GKE credentials
@@ -53,7 +53,7 @@ jobs:
             --zone ${{ secrets.GKE_ZONE }} \
             --project ${{ secrets.GKE_PROJECT }}
 
-      # 9️⃣ 🔐 Create / Update Kubernetes secrets (NO secrets in git)
+      # 9️⃣ Create / Update backend secrets
       - name: Create backend secrets
         run: |
           kubectl create secret generic backend-secrets \
@@ -66,10 +66,13 @@ jobs:
             --from-literal=CLIENT_ORIGIN="${{ secrets.CLIENT_ORIGIN }}" \
             --dry-run=client -o yaml | kubectl apply -f -
 
-      # 🔟 Deploy backend
+      # 🔟 Deploy backend (FORCE new image)
       - name: Deploy Backend
         run: |
           kubectl apply -f Kubernet/backend-deployment.yaml
           kubectl apply -f Kubernet/backend-service.yaml
-          kubectl rollout status deployment/backend
 
+          kubectl set image deployment/backend \
+            backend=gcr.io/${{ secrets.GKE_PROJECT }}/backend:${{ github.sha }}
+
+          kubectl rollout status deployment/backend
