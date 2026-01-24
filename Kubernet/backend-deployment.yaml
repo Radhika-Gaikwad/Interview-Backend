@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: gcr.io/interview-ai-482614/backend:1.5
+          image: gcr.io/interview-ai-482614/backend:PLACEHOLDER
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           envFrom:
