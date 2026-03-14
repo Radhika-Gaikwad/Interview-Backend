@@ -6,7 +6,10 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import sessionRoutes from "./routes/session.routes.js";
+import resumeRoutes from "./routes/resume.routes.js";
 import * as paymentController from "./controllers/payment.controller.js";
+import uploadRoutes from "./routes/upload.routes.js";
 
 if (process.env.NODE_ENV !== "production") {
   const dotenv = await import("dotenv");
@@ -15,9 +18,9 @@ if (process.env.NODE_ENV !== "production") {
 
 // Warn if critical env vars are missing (do not print secrets)
 if (!process.env.JWT_SECRET) {
-	console.error("Warning: JWT_SECRET is not set. Authentication will fail until configured.");
+  console.error("Warning: JWT_SECRET is not set. Authentication will fail until configured.");
 } else {
-	console.log("JWT_SECRET loaded");
+  console.log("JWT_SECRET loaded");
 }
 
 const app = express();
@@ -48,14 +51,17 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/sessions", sessionRoutes);
+app.use("/api/resume", resumeRoutes);
 app.get("/api/test", (req, res) => {
-	res.json({ msg: "Backend is alive!" });
+  res.json({ msg: "Backend is alive!" });
 });
+app.use("/api/upload", uploadRoutes);
 
 app.post(
-	"/api/webhook/stripe",
-	express.raw({ type: "application/json" }),
-	paymentController.stripeWebhook
+  "/api/webhook/stripe",
+  express.raw({ type: "application/json" }),
+  paymentController.stripeWebhook
 );
 
 

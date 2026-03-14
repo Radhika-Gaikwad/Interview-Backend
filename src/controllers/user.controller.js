@@ -6,7 +6,8 @@ import * as userService from "../Services/UserService.js";
  */
 export const getProfile = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;   // ✅ FIX
+
     const user = await userService.getUserById(userId);
 
     res.json({ user });
@@ -15,13 +16,10 @@ export const getProfile = async (req, res) => {
   }
 };
 
-/**
- * PUT /api/users/me
- * Update logged-in user profile
- */
 export const updateProfile = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;   // ✅ FIX
+
     const updatedUser = await userService.updateUserById(
       userId,
       req.body
@@ -35,3 +33,4 @@ export const updateProfile = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+

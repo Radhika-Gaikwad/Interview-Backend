@@ -12,54 +12,42 @@ function getStripe() {
 }
 
 const createCheckoutSession = async ({ user, plan }) => {
+  if (!user || !user._id) {
+    throw new Error("Invalid user: _id missing");
+  }
+
   const stripe = getStripe();
-
   const clientOrigin = process.env.CLIENT_ORIGIN;
-
-  if (!clientOrigin) {
-    console.error("❌ CLIENT_ORIGIN is missing");
-    throw new Error("CLIENT_ORIGIN is not set");
-  }
-
-  if (!clientOrigin.startsWith("http://") && !clientOrigin.startsWith("https://")) {
-    console.error("❌ Invalid CLIENT_ORIGIN:", clientOrigin);
-    throw new Error("CLIENT_ORIGIN must include http/https");
-  }
+  if (!clientOrigin) throw new Error("CLIENT_ORIGIN is not set");
 
   const successUrl = `${clientOrigin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${clientOrigin}/payment-cancel`;
 
-  console.log("✅ Stripe success_url:", successUrl);
-  console.log("✅ Stripe cancel_url:", cancelUrl);
-
+  // Stripe checkout session
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     customer_email: user.email,
-
     line_items: [
       {
         price_data: {
           currency: "inr",
-          product_data: {
-            name: `${plan.title} Interview Credits`,
-          },
+          product_data: { name: `${plan.title} Interview Credits` },
           unit_amount: plan.amount * 100,
         },
         quantity: 1,
       },
     ],
-
     success_url: successUrl,
     cancel_url: cancelUrl,
-
     metadata: {
-      userId: user.userId,
-      credits: plan.credits,
+      userId: user._id.toString(), // ✅ safe now
+      credits: plan.credits.toString(),
     },
   });
 
+  // Save payment record
   await Payment.create({
-    userId: user.userId,
+    userId: user._id,
     stripeSessionId: session.id,
     amount: plan.amount,
     currency: "INR",
@@ -70,21 +58,14 @@ const createCheckoutSession = async ({ user, plan }) => {
   return session.url;
 };
 
-
-
 const fulfillPayment = async (session) => {
-  const payment = await Payment.findOne({
-    stripeSessionId: session.id,
-  });
-
+  const payment = await Payment.findOne({ stripeSessionId: session.id });
   if (!payment || payment.status === "paid") return;
 
   payment.status = "paid";
   await payment.save();
 
-  await User.findByIdAndUpdate(payment.userId, {
-    $inc: { credits: payment.credits },
-  });
+  await User.findByIdAndUpdate(payment.userId, { $inc: { credits: payment.credits } });
 };
 
 export default {

@@ -7,28 +7,24 @@ import Stripe from "stripe";
  */
 export const createCheckout = async (req, res) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
     const { plan } = req.body;
-    if (!plan) {
-      return res.status(400).json({ message: "Plan is required" });
-    }
+    if (!plan) return res.status(400).json({ message: "Plan is required" });
 
-    // ✅ This must return session.url
-    const checkoutUrl = await paymentService.createCheckoutSession({
-      user: req.user,
-      plan,
-    });
+    // Make sure req.user._id exists
+    const user = {
+      _id: req.user._id || req.user.id, // fallback if your auth middleware sets id
+      email: req.user.email,
+    };
 
+    const checkoutUrl = await paymentService.createCheckoutSession({ user, plan });
     return res.json({ url: checkoutUrl });
   } catch (err) {
     console.error("createCheckout error:", err);
     return res.status(500).json({ message: err.message });
   }
 };
-
 /**
  * Stripe webhook (recommended for production)
  */

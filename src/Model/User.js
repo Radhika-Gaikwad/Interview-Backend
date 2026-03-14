@@ -13,6 +13,7 @@ const UserSchema = new mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
+      trim: true,
       index: true,
     },
 
@@ -21,6 +22,7 @@ const UserSchema = new mongoose.Schema(
       required: function () {
         return this.authProvider === "local";
       },
+      select: false,
     },
 
     role: {
@@ -40,7 +42,8 @@ const UserSchema = new mongoose.Schema(
     },
 
     authProviderId: {
-      type: String, // sub from Auth0
+      type: String,
+      default: null,
     },
 
     onboardingCompleted: {
@@ -49,15 +52,29 @@ const UserSchema = new mongoose.Schema(
     },
 
     interviewStats: {
-      sessionsTaken: { type: Number, default: 0 },
-      averageScore: { type: Number, default: 0 },
+      sessionsTaken: {
+        type: Number,
+        default: 0,
+      },
+      averageScore: {
+        type: Number,
+        default: 0,
+      },
     },
 
     credits: {
-  type: Number,
-  default: 0,
-},
+      type: Number,
+      default: 0,
+    },
 
+    resetOtp: {
+      type: String,
+    },
+
+    resetOtpExpiry: {
+      type: Date,
+      index: true,
+    },
   },
   { timestamps: true }
 );

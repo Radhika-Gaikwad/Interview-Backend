@@ -100,3 +100,48 @@ export const debugCookies = (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+
+export const changePassword = async (req, res) => {
+  const { newPassword, confirmPassword } = req.body;
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords do not match" });
+  }
+
+  await authService.changePassword(req.user.id, newPassword);
+
+  // Auto logout
+  res.clearCookie("token");
+
+  res.json({ message: "Password changed. Please login again." });
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    if (!req.body.email) {
+ return res.status(400).json({ message: "Email is required" });
+}
+    await authService.forgotPassword(req.body.email);
+    res.json({ message: "OTP sent to email" });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword, confirmPassword } = req.body;
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    await authService.resetPasswordWithOtp(email, otp, newPassword);
+
+    res.json({ message: "Password reset successful. Please login." });
+
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
