@@ -1,11 +1,12 @@
 import os from "os";
 import path from "path";
 import { Storage } from "@google-cloud/storage";
-import textUtils from "./textUtils.js"; // your existing extraction utils
+import textUtils from "./textUtils.js"; 
 
 const storage = new Storage({
-  keyFilename: "config/gcs-key.json",
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
 });
+
 
 const bucketName = "resumeanswerflow-ai";
 
