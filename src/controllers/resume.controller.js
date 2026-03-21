@@ -45,18 +45,22 @@ export const getResumes = async (req, res) => {
 export const viewResume = async (req, res) => {
   try {
     const resume = await Resume.findById(req.params.id);
-    if (!resume) return res.status(404).json({ error: "Resume not found" });
+
+    if (!resume) {
+      return res.status(404).json({ error: "Resume not found" });
+    }
 
     const filePath = resume.previewPdfPath || resume.resumePath;
-
     const file = bucket.file(filePath);
 
     const [url] = await file.getSignedUrl({
       action: "read",
-      expires: Date.now() + 10 * 60 * 1000,
+      expires: Date.now() + 15 * 60 * 1000, // 15 min
     });
 
-    return res.redirect(url);
+    // ✅ RETURN JSON (not redirect)
+    return res.json({ url });
+
   } catch (err) {
     console.error("Preview error:", err);
     res.status(500).json({ error: "Preview failed" });
@@ -72,29 +76,14 @@ export const downloadResume = async (req, res) => {
 
     const file = bucket.file(resume.resumePath);
 
-    // Check if file exists in GCS
-    const [exists] = await file.exists();
-    if (!exists) {
-      return res.status(404).json({ error: "File not found in storage" });
-    }
+    const [url] = await file.getSignedUrl({
+      action: "read",
+      expires: Date.now() + 15 * 60 * 1000,
+      responseDisposition: `attachment; filename="${resume.title}${path.extname(resume.resumePath)}"`
+    });
 
-    const ext = path.extname(resume.resumePath);
-
-    // ✅ Force browser download
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="${resume.title}${ext}"`
-    );
-
-    res.setHeader("Content-Type", "application/octet-stream");
-
-    // ✅ Stream file directly (NO redirect)
-    file.createReadStream()
-      .on("error", (err) => {
-        console.error("Stream error:", err);
-        res.status(500).end();
-      })
-      .pipe(res);
+    // ✅ RETURN URL instead of streaming
+    return res.json({ url });
 
   } catch (err) {
     console.error("Download error:", err);

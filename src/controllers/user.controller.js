@@ -34,3 +34,22 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+export const fetchUserCredits = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const data = await userService.getUserCredits(userId);
+
+    res.status(200).json({
+      success: true,
+      message: "Credits fetched successfully",
+      data,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+

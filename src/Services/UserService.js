@@ -41,3 +41,15 @@ export const updateUserById = async (userId, updateData) => {
 
   return updatedUser;
 };
+
+export const getUserCredits = async (userId) => {
+  const user = await User.findById(userId).select("credits");
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return {
+    credits: user.credits,
+  };
+};

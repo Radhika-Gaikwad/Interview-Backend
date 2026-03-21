@@ -206,6 +206,44 @@ const deleteSession = async ({ sessionId, userId }) => {
   return true;
 };
 
+
+const duplicateSession = async ({ sessionId, userId }) => {
+  const session = await Session.findById(sessionId);
+
+  if (!session) throw new Error("Session not found");
+
+  // Ownership check
+  if (session.owner.toString() !== userId.toString()) {
+    throw new Error("Not authorized to duplicate this session");
+  }
+
+  // Convert to object & remove fields we don't want to copy
+  const sessionObj = session.toObject();
+
+  delete sessionObj._id;
+  delete sessionObj.createdAt;
+  delete sessionObj.updatedAt;
+
+  // Reset important fields
+  sessionObj.status = "draft";
+  sessionObj.startAt = null;
+  sessionObj.endAt = null;
+  sessionObj.creditsUsed = 0;
+  sessionObj.actualDurationMinutes = null;
+
+  // Optional: change title so user knows it's a copy
+  sessionObj.title = `${session.title || "Session"} (Copy)`;
+
+  // Create new session
+  const newSession = new Session({
+    ...sessionObj,
+    owner: userId,
+  });
+
+  await newSession.save();
+
+  return newSession;
+};
 export default {
   createSession,
   getSessionById,
@@ -214,4 +252,5 @@ export default {
   startSession,
   endSession,
   deleteSession,
+  duplicateSession,
 };

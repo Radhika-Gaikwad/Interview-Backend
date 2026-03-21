@@ -109,3 +109,17 @@ export const endSession = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
+export const duplicateSession = async (req, res) => {
+  try {
+    const session = await sessionService.duplicateSession({
+      sessionId: req.params.id,
+      userId: req.user.id,
+    });
+
+    res.json(session);
+  } catch (err) {
+    console.error("duplicateSession error:", err);
+    res.status(400).json({ message: err.message });
+  }
+};

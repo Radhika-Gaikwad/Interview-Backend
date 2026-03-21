@@ -1,6 +1,8 @@
 import Resume from "../Model/Resume.js";
 import { bucket } from "../utils/gcs.js";
 
+
+const BASE_URL = process.env.BACKEND_URL;
 // create resume
 export const createResume = async (data) => {
   // Determine version for the same user & same title
@@ -44,8 +46,8 @@ export const getResumes = async (userId, page = 1, limit = 6) => {
   const formatted = resumes.map((r) => ({
     ...r,
     title: `${r.title} (v${r.version})`,
-    previewUrl: `/api/resume/view/${r._id}`,
-    downloadUrl: `/api/resume/download/${r._id}`,
+   previewUrl: `${BASE_URL}/api/resume/view/${r._id}`,
+downloadUrl: `${BASE_URL}/api/resume/download/${r._id}`,
   }));
 
   return {

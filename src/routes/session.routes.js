@@ -14,5 +14,6 @@ router.delete("/:id", auth, sessionController.deleteSession);
 router.post("/:id/connect", auth, sessionController.startSession);
 // End session and deduct credits based on duration
 router.post("/:id/end", auth, sessionController.endSession);
+router.post("/:id/duplicate", auth, sessionController.duplicateSession);
 
 export default router;
