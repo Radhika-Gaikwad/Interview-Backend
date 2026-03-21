@@ -28,6 +28,7 @@ connectDB();
 const allowedOrigins = [
   "http://localhost:5173",
   "https://34.54.116.200.nip.io",
+  "https://interview-user.onrender.com"
 ];
 
 app.use(

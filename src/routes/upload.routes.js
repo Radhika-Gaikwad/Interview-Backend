@@ -14,6 +14,7 @@ import libre from "libreoffice-convert";
 import util from "util";
 
 const libreConvert = util.promisify(libre.convert);
+const BASE_URL = process.env.BACKEND_URL;
 
 const router = express.Router();
 const upload = multer({
@@ -65,43 +66,43 @@ router.post("/upload-resume", auth, upload.single("resume"), async (req, res) =>
     /* ===============================
        STEP 2: Upload original resume
     =============================== */
-   const t2 = Date.now();
+    const t2 = Date.now();
 
-const cleanName = file.originalname.replace(/[^a-zA-Z0-9.]/g, "_");
-const baseName = `${Date.now()}-v${version}-${cleanName}`;
-const resumePath = `resumes/uploaded/${baseName}`;
+    const cleanName = file.originalname.replace(/[^a-zA-Z0-9.]/g, "_");
+    const baseName = `${Date.now()}-v${version}-${cleanName}`;
+    const resumePath = `resumes/uploaded/${baseName}`;
 
-// Upload ORIGINAL file (doc/docx/pdf)
-await bucket.file(resumePath).save(file.buffer, {
-  contentType: file.mimetype,
-  resumable: false,
-});
+    // Upload ORIGINAL file (doc/docx/pdf)
+    await bucket.file(resumePath).save(file.buffer, {
+      contentType: file.mimetype,
+      resumable: false,
+    });
 
-let previewPdfPath = resumePath; // default (for PDF uploads)
+    let previewPdfPath = resumePath; // default (for PDF uploads)
 
-// ✅ If DOC or DOCX → Convert to PDF
-if (
-  file.mimetype ===
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-  file.mimetype === "application/msword"
-) {
-  console.log(`[${requestId}] 🔄 Converting DOC to PDF`);
+    // ✅ If DOC or DOCX → Convert to PDF
+    if (
+      file.mimetype ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      file.mimetype === "application/msword"
+    ) {
+      console.log(`[${requestId}] 🔄 Converting DOC to PDF`);
 
-  const pdfBuffer = await libreConvert(file.buffer, ".pdf", undefined);
+      const pdfBuffer = await libreConvert(file.buffer, ".pdf", undefined);
 
-  const pdfName = baseName.replace(path.extname(baseName), ".pdf");
-  previewPdfPath = `resumes/preview/${pdfName}`;
+      const pdfName = baseName.replace(path.extname(baseName), ".pdf");
+      previewPdfPath = `resumes/preview/${pdfName}`;
 
-  await bucket.file(previewPdfPath).save(pdfBuffer, {
-    contentType: "application/pdf",
-    resumable: false,
-  });
+      await bucket.file(previewPdfPath).save(pdfBuffer, {
+        contentType: "application/pdf",
+        resumable: false,
+      });
 
-  console.log(`[${requestId}] ✅ DOC converted & PDF uploaded`);
-}
+      console.log(`[${requestId}] ✅ DOC converted & PDF uploaded`);
+    }
 
-logStep("STEP 2", `Original uploaded → ${resumePath}`);
-logTime("STEP 2 duration", t2);
+    logStep("STEP 2", `Original uploaded → ${resumePath}`);
+    logTime("STEP 2 duration", t2);
 
     /* ===============================
        STEP 3: Extract text
@@ -113,13 +114,13 @@ logTime("STEP 2 duration", t2);
     tempFiles.push(tempResumePath);
 
     const extractedText = await textUtils.extractText(tempResumePath);
-// DEBUG: log final extracted text
-const debugPath = path.join(os.tmpdir(), `DEBUG_${baseName}.txt`);
-await fs.writeFile(debugPath, extractedText);
+    // DEBUG: log final extracted text
+    const debugPath = path.join(os.tmpdir(), `DEBUG_${baseName}.txt`);
+    await fs.writeFile(debugPath, extractedText);
 
-console.log("========== EXTRACTED TEXT SENT TO GEMINI ==========");
-console.log(extractedText);
-console.log("====================================================");
+    console.log("========== EXTRACTED TEXT SENT TO GEMINI ==========");
+    console.log(extractedText);
+    console.log("====================================================");
     logStep("STEP 3", `Text extracted (${extractedText.length} chars)`);
     logTime("STEP 3 duration", t3);
 
@@ -184,18 +185,18 @@ console.log("====================================================");
     =============================== */
     const t7 = Date.now();
 
-const resumeDoc = await Resume.create({
-  user: userId,
-  email,
-  title: title || file.originalname,
-  version,
-  resumePath,
-  previewPdfPath,   // ✅ ADD THIS
-  textPath,
-  jsonPath,
-  parsedData,
-  isDefault: true,
-});
+    const resumeDoc = await Resume.create({
+      user: userId,
+      email,
+      title: title || file.originalname,
+      version,
+      resumePath,
+      previewPdfPath,   // ✅ ADD THIS
+      textPath,
+      jsonPath,
+      parsedData,
+      isDefault: true,
+    });
 
     logStep("STEP 7", `Resume saved with ID ${resumeDoc._id}`);
     logTime("STEP 7 duration", t7);
@@ -219,10 +220,10 @@ const resumeDoc = await Resume.create({
         title: displayTitle,   // ✅ user-friendly title
         originalTitle: resumeDoc.title, // optional (useful for editing)
         version: resumeDoc.version,
-        
+
         isDefault: resumeDoc.isDefault,
-        previewUrl: `/api/resume/view/${resumeDoc._id}`,
-        downloadUrl: `/api/resume/download/${resumeDoc._id}`,
+        previewUrl: `${BASE_URL}/api/resume/view/${resumeDoc._id}`,
+        downloadUrl: `${BASE_URL}/api/resume/download/${resumeDoc._id}`,
       },
     });
   } catch (error) {
