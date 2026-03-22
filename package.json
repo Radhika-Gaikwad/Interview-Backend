@@ -12,6 +12,7 @@
     "@google/genai": "^1.42.0",
     "adm-zip": "^0.5.16",
     "async": "^3.2.6",
+    "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cookie-session": "^2.1.1",

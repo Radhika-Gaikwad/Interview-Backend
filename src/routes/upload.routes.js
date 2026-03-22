@@ -12,7 +12,7 @@ import Resume from "../Model/Resume.js";
 import auth from "../middleware/auth.middleware.js";
 import libre from "libreoffice-convert";
 import util from "util";
-import { convertToPdf } from "../utils/cloudConvert.js";
+import { convertToPdf } from "../utils/convertToPdf.js";
 
 const libreConvert = util.promisify(libre.convert);
 const BASE_URL = process.env.BACKEND_URL;
