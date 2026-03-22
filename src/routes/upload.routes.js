@@ -12,6 +12,7 @@ import Resume from "../Model/Resume.js";
 import auth from "../middleware/auth.middleware.js";
 import libre from "libreoffice-convert";
 import util from "util";
+import { convertToPdf } from "../utils/cloudConvert.js";
 
 const libreConvert = util.promisify(libre.convert);
 const BASE_URL = process.env.BACKEND_URL;
@@ -80,25 +81,38 @@ router.post("/upload-resume", auth, upload.single("resume"), async (req, res) =>
 
     let previewPdfPath = resumePath; // default (for PDF uploads)
 
-    // ✅ If DOC or DOCX → Convert to PDF
-    if (
-      file.mimetype ===
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      file.mimetype === "application/msword"
-    ) {
-      console.log(`[${requestId}] 🔄 Converting DOC to PDF`);
+    // Detect DOC/DOCX safely
+    const isDoc =
+      file.originalname.toLowerCase().endsWith(".doc") ||
+      file.originalname.toLowerCase().endsWith(".docx");
 
-      const pdfBuffer = await libreConvert(file.buffer, ".pdf", undefined);
+    if (isDoc) {
+      console.log(`[${requestId}] 🔄 Converting DOC to PDF (CloudConvert)`);
 
-      const pdfName = baseName.replace(path.extname(baseName), ".pdf");
-      previewPdfPath = `resumes/preview/${pdfName}`;
+      try {
+        // ⏱ Add timeout protection
+        const pdfBuffer = await Promise.race([
+          convertToPdf(file.buffer),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Conversion timeout")), 10000)
+          ),
+        ]);
 
-      await bucket.file(previewPdfPath).save(pdfBuffer, {
-        contentType: "application/pdf",
-        resumable: false,
-      });
+        const pdfName = baseName.replace(path.extname(baseName), ".pdf");
+        previewPdfPath = `resumes/preview/${pdfName}`;
 
-      console.log(`[${requestId}] ✅ DOC converted & PDF uploaded`);
+        await bucket.file(previewPdfPath).save(pdfBuffer, {
+          contentType: "application/pdf",
+          resumable: false,
+        });
+
+        console.log(`[${requestId}] ✅ DOC converted & PDF uploaded`);
+      } catch (err) {
+        console.error(`[${requestId}] ❌ CloudConvert failed`, err);
+
+        // 🔥 CRITICAL fallback
+        previewPdfPath = resumePath;
+      }
     }
 
     logStep("STEP 2", `Original uploaded → ${resumePath}`);
