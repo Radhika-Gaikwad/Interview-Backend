@@ -1,5 +1,6 @@
 import Session from "../Model/Session.js";
 import User from "../Model/User.js";
+const BASE_URL = process.env.BACKEND_URL;
 
 const createSession = async ({ userId, payload }) => {
   const doc = new Session({ ...payload, owner: userId });
@@ -36,13 +37,13 @@ const listSessionsForUser = async (userId, page = 1, limit = 6) => {
 
     resumeName: s.resumeId?.title || s.selectedResumeName || "Deleted Resume",
 
-    resumePreviewUrl: s.resumeId
-      ? `/api/resume/view/${s.resumeId._id}`
-      : null,
+     resumePreviewUrl: s.resumeId
+    ? `${BASE_URL}/api/resume/view/${s.resumeId._id}`
+    : null,
 
-    resumeDownloadUrl: s.resumeId
-      ? `/api/resume/download/${s.resumeId._id}`
-      : null,
+  resumeDownloadUrl: s.resumeId
+    ? `${BASE_URL}/api/resume/download/${s.resumeId._id}`
+    : null,
   }));
 
   return {
