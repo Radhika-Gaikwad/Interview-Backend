@@ -12,7 +12,6 @@ const SessionSchema = new mongoose.Schema(
     scheduledAt: Date,
     meetingLink: String,
 
-    // ⭐ reference resume
     resumeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Resume",
@@ -24,6 +23,7 @@ const SessionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true, // ✅ single index
     },
 
     language: { type: String, default: "English" },
@@ -44,6 +44,7 @@ const SessionSchema = new mongoose.Schema(
       type: String,
       enum: ["draft","scheduled","active","completed","cancelled","expired"],
       default: "draft",
+      index: true, // ✅ useful filter index
     },
 
     startAt: Date,
@@ -53,5 +54,16 @@ const SessionSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+/* ================= COMPOUND INDEXES (CRITICAL) ================= */
+
+// 🔥 MOST IMPORTANT (your main query)
+SessionSchema.index({ owner: 1, createdAt: -1 });
+
+// 🔥 for filtering by status + owner
+SessionSchema.index({ owner: 1, status: 1 });
+
+// 🔥 optional (if you query scheduled sessions)
+SessionSchema.index({ owner: 1, scheduledAt: 1 });
 
 export default mongoose.model("Session", SessionSchema);

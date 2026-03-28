@@ -1,21 +1,40 @@
 import express from "express";
-import authMiddleware from "../middleware/auth.middleware.js";
+import auth from "../middleware/auth.middleware.js";
 import * as resumeController from "../controllers/resume.controller.js";
+import { cacheMiddleware } from "../middleware/cache.middleware.js";
 
 const router = express.Router();
 
 /**
- * Resume APIs
+ * ✅ Apply auth globally
  */
+router.use(auth);
 
-router.post("/", authMiddleware, resumeController.createResume);
+/* ================= NON-CACHE ================= */
 
-router.get("/", authMiddleware, resumeController.getResumes);
+// Create resume
+router.post("/", resumeController.createResume);
 
-router.get("/view/:id", authMiddleware, resumeController.viewResume);
+// Download (should NOT be cached)
+router.get("/download/:id", resumeController.downloadResume);
 
-router.get("/download/:id", authMiddleware, resumeController.downloadResume);
+// Delete resume
+router.delete("/:id", resumeController.deleteResume);
 
-router.delete("/:id", authMiddleware, resumeController.deleteResume);
+/* ================= CACHEABLE ================= */
+
+// List resumes (pagination)
+router.get(
+  "/",
+  cacheMiddleware("resume:list", 120), // 2 min cache
+  resumeController.getResumes
+);
+
+// View resume (signed URL - short cache)
+router.get(
+  "/view/:id",
+  cacheMiddleware("resume:view", 60), // 1 min cache
+  resumeController.viewResume
+);
 
 export default router;

@@ -9,41 +9,47 @@ const createSession = async ({ userId, payload }) => {
 };
 
 const getSessionById = async (sessionId) => {
-  const session = await Session.findById(sessionId).populate("owner", "fullName email");
+  const session = await Session.findById(sessionId)
+    .select("-__v")
+    .populate("owner", "fullName email")
+    .lean(); // ✅ faster
+
   if (!session) throw new Error("Session not found");
+
   return session;
 };
-
 const listSessionsForUser = async (userId, page = 1, limit = 6) => {
   const skip = (page - 1) * limit;
 
+  const query = { owner: userId };
+
   const [sessions, total] = await Promise.all([
-    Session.find({ owner: userId })
+    Session.find(query)
+      .select("-__v") // ✅ reduce payload
       .populate({
         path: "resumeId",
         match: { isDeleted: false },
         select: "title",
       })
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1 }) // ✅ now uses index
       .skip(skip)
       .limit(limit)
       .lean(),
 
-    Session.countDocuments({ owner: userId }),
+    Session.countDocuments(query), // uses index now
   ]);
 
   const mapped = sessions.map((s) => ({
     ...s,
-
     resumeName: s.resumeId?.title || s.selectedResumeName || "Deleted Resume",
 
-     resumePreviewUrl: s.resumeId
-    ? `${BASE_URL}/api/resume/view/${s.resumeId._id}`
-    : null,
+    resumePreviewUrl: s.resumeId
+      ? `${BASE_URL}/api/resume/view/${s.resumeId._id}`
+      : null,
 
-  resumeDownloadUrl: s.resumeId
-    ? `${BASE_URL}/api/resume/download/${s.resumeId._id}`
-    : null,
+    resumeDownloadUrl: s.resumeId
+      ? `${BASE_URL}/api/resume/download/${s.resumeId._id}`
+      : null,
   }));
 
   return {

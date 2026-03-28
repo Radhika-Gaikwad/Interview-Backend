@@ -1,38 +1,63 @@
 import * as userService from "../Services/UserService.js";
+import redis from "../config/redis.js";
 
-/**
- * GET /api/users/me
- * Get logged-in user profile
- */
-export const getProfile = async (req, res) => {
+/* ================= CACHE HELPERS ================= */
+
+// Clear user cache (used after update + payment)
+const clearUserCache = async (userId) => {
   try {
-    const userId = req.user.id;   // ✅ FIX
-
-    const user = await userService.getUserById(userId);
-
-    res.json({ user });
+    const keys = await redis.keys(`user:${userId}*`);
+    if (keys.length) {
+      await redis.del(keys);
+    }
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    console.error("User cache clear error:", err);
   }
 };
 
+/* ================= GET PROFILE (CACHEABLE) ================= */
+
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await userService.getUserById(userId);
+
+    // Optional CDN/browser cache
+    res.set("Cache-Control", "private, max-age=60");
+
+    return res.json({ user });
+
+  } catch (err) {
+    return res.status(404).json({ message: err.message });
+  }
+};
+
+/* ================= UPDATE PROFILE ================= */
+
 export const updateProfile = async (req, res) => {
   try {
-    const userId = req.user.id;   // ✅ FIX
+    const userId = req.user.id;
 
     const updatedUser = await userService.updateUserById(
       userId,
       req.body
     );
 
-    res.json({
+    // ❗ Invalidate cache after update
+    await clearUserCache(userId);
+
+    return res.json({
       message: "Profile updated successfully",
       user: updatedUser,
     });
+
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    return res.status(400).json({ message: err.message });
   }
 };
+
+/* ================= GET USER CREDITS (CACHEABLE) ================= */
 
 export const fetchUserCredits = async (req, res) => {
   try {
@@ -40,16 +65,19 @@ export const fetchUserCredits = async (req, res) => {
 
     const data = await userService.getUserCredits(userId);
 
-    res.status(200).json({
+    // Optional CDN/browser cache
+    res.set("Cache-Control", "private, max-age=60");
+
+    return res.status(200).json({
       success: true,
       message: "Credits fetched successfully",
       data,
     });
+
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message,
     });
   }
 };
-

@@ -2,9 +2,23 @@ import Resume from "../Model/Resume.js";
 import * as resumeService from "../Services/resume.service.js";
 import { bucket } from "../utils/gcs.js";
 import path from "path";
-/**
- * Create Resume (after upload pipeline)
- */
+import redis from "../config/redis.js";
+
+/* ================= CACHE HELPERS ================= */
+
+const clearResumeCache = async (userId) => {
+  try {
+    const keys = await redis.keys(`resume:${userId}*`);
+    if (keys.length) {
+      await redis.del(keys);
+    }
+  } catch (err) {
+    console.error("Resume cache clear error:", err);
+  }
+};
+
+/* ================= CREATE ================= */
+
 export const createResume = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -16,6 +30,9 @@ export const createResume = async (req, res) => {
       email,
     });
 
+    // ❗ Invalidate cache
+    await clearResumeCache(userId);
+
     res.status(201).json(resume);
   } catch (err) {
     console.error("Create resume error:", err);
@@ -23,9 +40,8 @@ export const createResume = async (req, res) => {
   }
 };
 
-/**
- * Get all resumes for logged-in user
- */
+/* ================= LIST (CACHEABLE) ================= */
+
 export const getResumes = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
@@ -42,6 +58,8 @@ export const getResumes = async (req, res) => {
   }
 };
 
+/* ================= VIEW (CACHEABLE - SHORT TTL) ================= */
+
 export const viewResume = async (req, res) => {
   try {
     const resume = await Resume.findById(req.params.id);
@@ -55,10 +73,9 @@ export const viewResume = async (req, res) => {
 
     const [url] = await file.getSignedUrl({
       action: "read",
-      expires: Date.now() + 15 * 60 * 1000, // 15 min
+      expires: Date.now() + 15 * 60 * 1000,
     });
 
-    // ✅ RETURN JSON (not redirect)
     return res.json({ url });
 
   } catch (err) {
@@ -66,6 +83,9 @@ export const viewResume = async (req, res) => {
     res.status(500).json({ error: "Preview failed" });
   }
 };
+
+/* ================= DOWNLOAD (NO CACHE) ================= */
+
 export const downloadResume = async (req, res) => {
   try {
     const resume = await Resume.findById(req.params.id);
@@ -82,7 +102,6 @@ export const downloadResume = async (req, res) => {
       responseDisposition: `attachment; filename="${resume.title}${path.extname(resume.resumePath)}"`
     });
 
-    // ✅ RETURN URL instead of streaming
     return res.json({ url });
 
   } catch (err) {
@@ -91,16 +110,17 @@ export const downloadResume = async (req, res) => {
   }
 };
 
+/* ================= DELETE ================= */
 
 export const deleteResume = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
     const resumeId = req.params.id;
 
-    const result = await resumeService.deleteResume(
-      resumeId,
-      userId
-    );
+    const result = await resumeService.deleteResume(resumeId, userId);
+
+    // ❗ Invalidate cache
+    await clearResumeCache(userId);
 
     return res.status(200).json({
       success: true,
