@@ -1,11 +1,8 @@
 import { signJwt as generateToken, getJwtExpiryMs } from "../utils/jwt.utils.js";
 import authService from "../Services/AuthService.js";
-import redis from "../config/redis.js";
 
-// Helper to clear cache
-const clearUserCache = async (userId) => {
-  await redis.del(`user:${userId}`);
-};
+
+
 
 // ================= SIGNUP =================
 export const signup = async (req, res) => {
@@ -18,7 +15,7 @@ export const signup = async (req, res) => {
       role: user.role,
     });
 
-    await clearUserCache(user._id);
+
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -51,7 +48,7 @@ export const login = async (req, res) => {
       role: user.role,
     });
 
-    await clearUserCache(user._id);
+
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -76,8 +73,6 @@ export const socialAuth = async (req, res) => {
       email: user.email,
       role: user.role,
     });
-
-    await clearUserCache(user._id);
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -126,7 +121,6 @@ export const changePassword = async (req, res) => {
 
   await authService.changePassword(req.user.id, newPassword);
 
-  await clearUserCache(req.user.id);
 
   res.clearCookie("token");
 

@@ -1,24 +1,7 @@
 import sessionService from "../Services/sessionService.js";
-import redis from "../config/redis.js";
+import Session from "../Model/Session.js";
+import crypto from "crypto";
 
-/* ================= CACHE HELPERS ================= */
-
-const clearSessionCache = async (userId, sessionId = null) => {
-  try {
-    const keys = [
-      `session:list:${userId}`, // list cache
-    ];
-
-    if (sessionId) {
-      keys.push(`session:${userId}:${sessionId}`); // single session cache
-    }
-
-    await redis.del(keys);
-
-  } catch (err) {
-    console.error("Cache clear error:", err);
-  }
-};
 
 /* ================= CREATE ================= */
 
@@ -28,7 +11,6 @@ export const createSession = async (req, res) => {
       userId: req.user.id,
       payload: req.body,
     });
-await clearSessionCache(req.user.id);
 
     res.json(session);
   } catch (err) {
@@ -42,12 +24,26 @@ await clearSessionCache(req.user.id);
 export const getSession = async (req, res) => {
   try {
     const session = await sessionService.getSessionById(req.params.id);
+
+    // ✅ lightweight hash (no stringify of huge object ideally)
+    const etag = crypto
+      .createHash("md5")
+      .update(session.updatedAt?.toISOString() || JSON.stringify(session))
+      .digest("hex");
+
+    // ✅ compare BEFORE sending response
+    if (req.headers["if-none-match"] === etag) {
+      return res.status(304).end(); // ⚡ instant return
+    }
+
+    res.set("ETag", etag);
+    res.set("Cache-Control", "private, max-age=60");
+
     res.json(session);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
 };
-
 /* ================= LIST (CACHEABLE) ================= */
 
 export const listMySessions = async (req, res) => {
@@ -55,11 +51,30 @@ export const listMySessions = async (req, res) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 6;
 
+    // ✅ Only fetch minimal data for ETag check
+    const minimal = await Session.find({ owner: req.user.id })
+      .select("updatedAt")
+      .sort({ updatedAt: -1 })
+      .limit(1)
+      .lean();
+
+    const lastUpdated = minimal[0]?.updatedAt?.toISOString() || "empty";
+
+    const etag = `${req.user.id}-${page}-${limit}-${lastUpdated}`;
+
+    if (req.headers["if-none-match"] === etag) {
+      return res.status(304).end(); // ⚡ no heavy query
+    }
+
+    // ❗ Only now run heavy query
     const result = await sessionService.listSessionsForUser(
       req.user.id,
       page,
       limit
     );
+
+    res.set("ETag", etag);
+    res.set("Cache-Control", "private, max-age=60");
 
     res.json(result);
   } catch (err) {
@@ -77,8 +92,6 @@ export const updateSession = async (req, res) => {
       update: req.body,
     });
 
-await clearSessionCache(req.user.id, req.params.id);
-
     res.json(updated);
   } catch (err) {
     console.error("updateSession error:", err);
@@ -94,9 +107,6 @@ export const deleteSession = async (req, res) => {
       sessionId: req.params.id,
       userId: req.user.id,
     });
-
-    // ❗ Invalidate cache
-    await clearSessionCache(req.user.id);
 
     res.json({ ok: true });
   } catch (err) {
@@ -114,7 +124,6 @@ export const startSession = async (req, res) => {
       options: req.body,
     });
 
-   await clearSessionCache(req.user.id, req.params.id);
 
     res.json(result);
   } catch (err) {
@@ -133,7 +142,6 @@ export const endSession = async (req, res) => {
       userId: req.user.id,
       endAt,
     });
-await clearSessionCache(req.user.id, req.params.id);
 
     res.json(result);
   } catch (err) {
@@ -149,8 +157,6 @@ export const duplicateSession = async (req, res) => {
       sessionId: req.params.id,
       userId: req.user.id,
     });
-
-await clearSessionCache(req.user.id, req.params.id);
 
     res.json(session);
   } catch (err) {

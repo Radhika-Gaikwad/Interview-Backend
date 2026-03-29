@@ -1,7 +1,7 @@
 import express from "express";
 import * as authController from "../controllers/auth.controller.js";
 import authMiddleware from "../middleware/auth.middleware.js";
-import { cacheMiddleware } from "../middleware/cache.middleware.js";
+
 
 const router = express.Router();
 
@@ -12,7 +12,6 @@ router.post("/social", authController.socialAuth);
 router.get(
   "/me",
   authMiddleware,
-  cacheMiddleware("user", 300),
   authController.me // ✅ FIXED
 );
 

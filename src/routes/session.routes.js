@@ -1,7 +1,6 @@
 import express from "express";
 import auth from "../middleware/auth.middleware.js";
 import * as sessionController from "../controllers/session.controller.js";
-import { cacheMiddleware } from "../middleware/cache.middleware.js";
 
 const router = express.Router();
 
@@ -35,14 +34,12 @@ router.post("/:id/duplicate", sessionController.duplicateSession);
 // List sessions (with pagination)
 router.get(
   "/",
-  cacheMiddleware("session:list", 120), // 2 min cache
   sessionController.listMySessions
 );
 
 // Get single session
 router.get(
   "/:id",
-  cacheMiddleware("session", 300), // 5 min cache
   sessionController.getSession
 );
 

@@ -1,20 +1,8 @@
 import paymentService from "../Services/paymentService.js";
 import Stripe from "stripe";
-import redis from "../config/redis.js";
 
-/* ================= CACHE HELPERS ================= */
 
-// Clear user-related cache (credits, profile, etc.)
-const clearUserCache = async (userId) => {
-  try {
-    const keys = await redis.keys(`user:${userId}*`);
-    if (keys.length) {
-      await redis.del(keys);
-    }
-  } catch (err) {
-    console.error("User cache clear error:", err);
-  }
-};
+
 
 /* ================= CREATE CHECKOUT ================= */
 
@@ -66,10 +54,7 @@ export const verifyCheckout = async (req, res) => {
       // Fulfill payment (idempotent inside service)
       const result = await paymentService.fulfillPayment(session);
 
-      // ❗ Invalidate user cache (credits updated)
-      if (session.metadata?.userId) {
-        await clearUserCache(session.metadata.userId);
-      }
+    
 
       return res.json({
         ok: true,
@@ -115,10 +100,7 @@ export const stripeWebhook = async (req, res) => {
       // Fulfill payment (idempotent)
       await paymentService.fulfillPayment(session);
 
-      // ❗ Invalidate cache
-      if (session.metadata?.userId) {
-        await clearUserCache(session.metadata.userId);
-      }
+    
     }
 
     return res.json({ received: true });

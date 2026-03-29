@@ -2,7 +2,7 @@ import express from "express";
 import auth from "../middleware/auth.middleware.js";
 import * as userController from "../controllers/user.controller.js";
 import * as paymentController from "../controllers/payment.controller.js";
-import { cacheMiddleware } from "../middleware/cache.middleware.js";
+
 
 const router = express.Router();
 
@@ -12,7 +12,6 @@ const router = express.Router();
 router.get(
   "/me",
   auth,
-  cacheMiddleware("user:profile", 120),
   userController.getProfile
 );
 
@@ -37,7 +36,6 @@ router.post(
 router.get(
   "/credits",
   auth,
-  cacheMiddleware("user:credits", 60),
   userController.fetchUserCredits
 );
 

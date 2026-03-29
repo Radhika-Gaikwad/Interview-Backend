@@ -2,20 +2,9 @@ import Resume from "../Model/Resume.js";
 import * as resumeService from "../Services/resume.service.js";
 import { bucket } from "../utils/gcs.js";
 import path from "path";
-import redis from "../config/redis.js";
+import crypto from "crypto";
 
-/* ================= CACHE HELPERS ================= */
 
-const clearResumeCache = async (userId) => {
-  try {
-    const keys = await redis.keys(`resume:${userId}*`);
-    if (keys.length) {
-      await redis.del(keys);
-    }
-  } catch (err) {
-    console.error("Resume cache clear error:", err);
-  }
-};
 
 /* ================= CREATE ================= */
 
@@ -30,8 +19,6 @@ export const createResume = async (req, res) => {
       email,
     });
 
-    // ❗ Invalidate cache
-    await clearResumeCache(userId);
 
     res.status(201).json(resume);
   } catch (err) {
@@ -45,11 +32,33 @@ export const createResume = async (req, res) => {
 export const getResumes = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
-
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 6;
 
+    // ✅ VERY LIGHT QUERY (only updatedAt)
+    const latest = await Resume.find({
+      user: userId,
+      isDeleted: false,
+    })
+      .select("updatedAt")
+      .sort({ updatedAt: -1 })
+      .limit(1)
+      .lean();
+
+    const lastUpdated = latest[0]?.updatedAt?.toISOString() || "empty";
+
+    const etag = `${userId}-${page}-${limit}-${lastUpdated}`;
+
+    // ✅ SHORT-CIRCUIT HERE
+    if (req.headers["if-none-match"] === etag) {
+      return res.status(304).end(); // ⚡ NO DB HEAVY CALL
+    }
+
+    // ❗ Only now run heavy query
     const result = await resumeService.getResumes(userId, page, limit);
+
+    res.set("ETag", etag);
+    res.set("Cache-Control", "private, max-age=60");
 
     res.json(result);
   } catch (err) {
@@ -62,19 +71,35 @@ export const getResumes = async (req, res) => {
 
 export const viewResume = async (req, res) => {
   try {
-    const resume = await Resume.findById(req.params.id);
+    const resumeId = req.params.id;
 
-    if (!resume) {
+    // ✅ Only fetch updatedAt (VERY FAST)
+    const meta = await Resume.findById(resumeId)
+      .select("updatedAt previewPdfPath resumePath")
+      .lean();
+
+    if (!meta) {
       return res.status(404).json({ error: "Resume not found" });
     }
 
-    const filePath = resume.previewPdfPath || resume.resumePath;
+    const etag = meta.updatedAt?.toISOString();
+
+    // ✅ RETURN EARLY (NO GCS CALL)
+    if (req.headers["if-none-match"] === etag) {
+      return res.status(304).end(); // ⚡ HUGE SAVING
+    }
+
+    // ❗ Only now generate signed URL
+    const filePath = meta.previewPdfPath || meta.resumePath;
     const file = bucket.file(filePath);
 
     const [url] = await file.getSignedUrl({
       action: "read",
       expires: Date.now() + 15 * 60 * 1000,
     });
+
+    res.set("ETag", etag);
+    res.set("Cache-Control", "private, max-age=60");
 
     return res.json({ url });
 
@@ -118,9 +143,6 @@ export const deleteResume = async (req, res) => {
     const resumeId = req.params.id;
 
     const result = await resumeService.deleteResume(resumeId, userId);
-
-    // ❗ Invalidate cache
-    await clearResumeCache(userId);
 
     return res.status(200).json({
       success: true,

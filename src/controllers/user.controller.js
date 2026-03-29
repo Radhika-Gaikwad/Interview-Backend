@@ -1,19 +1,8 @@
 import * as userService from "../Services/UserService.js";
-import redis from "../config/redis.js";
+import crypto from "crypto";
+import User from "../Model/User.js";
 
-/* ================= CACHE HELPERS ================= */
 
-// Clear user cache (used after update + payment)
-const clearUserCache = async (userId) => {
-  try {
-    const keys = await redis.keys(`user:${userId}*`);
-    if (keys.length) {
-      await redis.del(keys);
-    }
-  } catch (err) {
-    console.error("User cache clear error:", err);
-  }
-};
 
 /* ================= GET PROFILE (CACHEABLE) ================= */
 
@@ -21,9 +10,26 @@ export const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
 
+    // ✅ VERY LIGHT QUERY (only updatedAt)
+    const meta = await User.findById(userId)
+      .select("updatedAt")
+      .lean();
+
+    if (!meta) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const etag = meta.updatedAt?.toISOString();
+
+    // ✅ RETURN EARLY (NO FULL DB CALL)
+    if (req.headers["if-none-match"] === etag) {
+      return res.status(304).end(); // ⚡ ~10ms
+    }
+
+    // ❗ Only now fetch full data
     const user = await userService.getUserById(userId);
 
-    // Optional CDN/browser cache
+    res.set("ETag", etag);
     res.set("Cache-Control", "private, max-age=60");
 
     return res.json({ user });
@@ -44,8 +50,7 @@ export const updateProfile = async (req, res) => {
       req.body
     );
 
-    // ❗ Invalidate cache after update
-    await clearUserCache(userId);
+  
 
     return res.json({
       message: "Profile updated successfully",
@@ -63,10 +68,30 @@ export const fetchUserCredits = async (req, res) => {
   try {
     const userId = req.user.id;
 
+    // ✅ ONLY FETCH updatedAt + credits
+    const meta = await User.findById(userId)
+      .select("updatedAt credits")
+      .lean();
+
+    if (!meta) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const etag = `${meta.updatedAt?.toISOString()}-${meta.credits}`;
+
+    // ✅ EARLY RETURN
+    if (req.headers["if-none-match"] === etag) {
+      return res.status(304).end(); // ⚡ no DB/service call
+    }
+
+    // ❗ Only now call service
     const data = await userService.getUserCredits(userId);
 
-    // Optional CDN/browser cache
-    res.set("Cache-Control", "private, max-age=60");
+    res.set("ETag", etag);
+    res.set("Cache-Control", "private, max-age=30"); // shorter for credits
 
     return res.status(200).json({
       success: true,
