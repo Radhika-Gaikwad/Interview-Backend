@@ -1,0 +1,78 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Authenticate to GCP
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # 3️⃣ Setup gcloud
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GKE_PROJECT }}
+
+      # 4️⃣ Install GKE auth plugin
+      - name: Install GKE auth plugin
+        run: |
+          gcloud components install gke-gcloud-auth-plugin --quiet
+          echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
+
+      # 5️⃣ Configure Docker for GCR
+      - name: Configure Docker
+        run: gcloud auth configure-docker gcr.io --quiet
+
+      # 6️⃣ Build Docker image (UNIQUE TAG = commit SHA)
+      - name: Build Docker image
+        run: |
+          docker build -t gcr.io/${{ secrets.GKE_PROJECT }}/backend:${{ github.sha }} .
+
+      # 7️⃣ Push Docker image
+      - name: Push Docker image
+        run: |
+          docker push gcr.io/${{ secrets.GKE_PROJECT }}/backend:${{ github.sha }}
+
+      # 8️⃣ Connect to GKE
+      - name: Get GKE credentials
+        run: |
+          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} \
+            --zone ${{ secrets.GKE_ZONE }} \
+            --project ${{ secrets.GKE_PROJECT }}
+
+      # 9️⃣ Create / Update backend secrets
+      - name: Create backend secrets
+        run: |
+          kubectl create secret generic backend-secrets \
+            --from-literal=PORT=5000 \
+            --from-literal=MONGO_URI="${{ secrets.MONGO_URI }}" \
+            --from-literal=STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}" \
+            --from-literal=STRIPE_WEBHOOK_SECRET="${{ secrets.STRIPE_WEBHOOK_SECRET }}" \
+            --from-literal=JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            --from-literal=JWT_EXPIRES_IN=7d \
+            --from-literal=CLIENT_ORIGIN="${{ secrets.CLIENT_ORIGIN }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      # 🔟 Deploy backend (FORCE rollout)
+      - name: Deploy Backend
+        run: |
+          kubectl apply -f Kubernet/backend-deployment.yaml
+          kubectl apply -f Kubernet/backend-service.yaml
+
+          kubectl set image deployment/backend \
+            backend=gcr.io/${{ secrets.GKE_PROJECT }}/backend:${{ github.sha }}
+
+          kubectl rollout status deployment/backend
