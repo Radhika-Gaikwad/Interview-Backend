@@ -1,4 +1,4 @@
 node_modules
 .env
 .git
-.config
+/config/        # only ignore root config
