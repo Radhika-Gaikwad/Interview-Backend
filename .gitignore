@@ -6,4 +6,8 @@ npm-debug.log
 .env
 /config/
 src/config/gcs-key.json
+<<<<<<< HEAD
 config/gcs-key.json
+=======
+config/gcs-key.json
+>>>>>>> afc8971b2c5df0f969042c9025158b3ff5279b4c

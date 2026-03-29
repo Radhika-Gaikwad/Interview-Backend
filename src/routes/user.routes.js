@@ -3,7 +3,6 @@ import auth from "../middleware/auth.middleware.js";
 import * as userController from "../controllers/user.controller.js";
 import * as paymentController from "../controllers/payment.controller.js";
 
-
 const router = express.Router();
 
 /* ================= USER ================= */
