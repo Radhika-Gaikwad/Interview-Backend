@@ -4,5 +4,6 @@ node_modules
 npm-debug.log
 .DS_Store
 .env
-/config/               # ignore only root config
-src/config/gcs-key.json  # ignore this secret file
+/config/
+src/config/gcs-key.json
+config/gcs-key.json
