@@ -1,19 +1,8 @@
-import { Storage } from "@google-cloud/storage";
-
-const isProduction = process.env.NODE_ENV === "production";
-
-export const storage = new Storage({
-  projectId: process.env.GCS_PROJECT_ID,
-
-  ...(isProduction
-    ? {
-        credentials: JSON.parse(process.env.GCS_KEY), // ✅ from ENV
-      }
-    : {
-        keyFilename: "config/gcs-key.json", // ✅ local dev only
-      }),
-});
+import admin from "firebase-admin";
+import db from "../config/db.js"; // This ensures Firebase is initialized BEFORE we call storage
 
 export const bucketName = process.env.GCS_BUCKET;
 
-export const bucket = storage.bucket(bucketName);
+// We use Firebase Admin's built-in storage instead of a separate Google Cloud instance.
+// This completely bypasses the file-path resolution error because Firebase is already authenticated!
+export const bucket = admin.storage().bucket(bucketName);

@@ -1,0 +1,1499 @@
+
+========== FETCHING ALL: PAYMENTS ==========
+
+--- payments ID: 695a57a0cb376a257b8fea6a ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1pTgX1gaI9CloeQMygLaILQieLQiarNZhaXTGamxISQfq5eXUkt6qdKAY",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1767528352,
+    "_nanoseconds": 604000000
+  },
+  "updatedAt": {
+    "_seconds": 1767528352,
+    "_nanoseconds": 604000000
+  }
+}
+
+--- payments ID: 695a587c294dfcb8478f8d97 ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "pi_3Slq7kFi1RNkgJ5f07uNJzXX",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1767528572,
+    "_nanoseconds": 770000000
+  },
+  "updatedAt": {
+    "_seconds": 1767528572,
+    "_nanoseconds": 770000000
+  }
+}
+
+--- payments ID: 695a5bd7294dfcb8478f8d99 ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "pi_3SlqLaFi1RNkgJ5f1H9r0Df4",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1767529431,
+    "_nanoseconds": 38000000
+  },
+  "updatedAt": {
+    "_seconds": 1767529431,
+    "_nanoseconds": 38000000
+  }
+}
+
+--- payments ID: 695a5d8b9f7c9d2f3121f54e ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1afNdMzAhZD01uo61TiFugN4mF2l27GbpyUCpvBfgTuFOKZzRr94nagZ9",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1767529867,
+    "_nanoseconds": 201000000
+  },
+  "updatedAt": {
+    "_seconds": 1767529867,
+    "_nanoseconds": 201000000
+  }
+}
+
+--- payments ID: 695a9d879f7c9d2f3121f550 ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1RetrBCCDJym293r3XOUYs22imimegtSbtv9wC4qPZaCeIH0DoomWfs6N",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1767546247,
+    "_nanoseconds": 552000000
+  },
+  "updatedAt": {
+    "_seconds": 1767546317,
+    "_nanoseconds": 472000000
+  }
+}
+
+--- payments ID: 695a9e139f7c9d2f3121f555 ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1WwhoneSRfJ9lDNQ4XlLAJD7PUrsrEj7faw3oSOJbwlCvrTLjQ23DtDNP",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1767546387,
+    "_nanoseconds": 481000000
+  },
+  "updatedAt": {
+    "_seconds": 1767546405,
+    "_nanoseconds": 923000000
+  }
+}
+
+--- payments ID: 695a9ec59f7c9d2f3121f55a ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1KNn72hTmxyWSYDhmWsjvxH4FE6WASO7HEjC7mOKTQBArAuDHJShFJ5Hv",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1767546565,
+    "_nanoseconds": 599000000
+  },
+  "updatedAt": {
+    "_seconds": 1767546579,
+    "_nanoseconds": 634000000
+  }
+}
+
+--- payments ID: 695aa48e9f7c9d2f3121f55f ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1ViynTm889Qv0lzUBFOpefvZj9ydSnU5VHgWralDzTlnS5uAJ5ZwaoDFH",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1767548046,
+    "_nanoseconds": 912000000
+  },
+  "updatedAt": {
+    "_seconds": 1767548062,
+    "_nanoseconds": 26000000
+  }
+}
+
+--- payments ID: 695aa48f9f7c9d2f3121f561 ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a12nWCfnmoB3eKbybEbce4Tsde0OOurfpfjDwlREyuPUjWJQpXKEbXvXy3",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1767548047,
+    "_nanoseconds": 693000000
+  },
+  "updatedAt": {
+    "_seconds": 1767548047,
+    "_nanoseconds": 693000000
+  }
+}
+
+--- payments ID: 695aab1f9f7c9d2f3121f567 ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1WdgbPC5iEIySdt9YYM539i4qxVvkPiU1TI34D0rf91ZKFvMvjlRRSXUs",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1767549727,
+    "_nanoseconds": 403000000
+  },
+  "updatedAt": {
+    "_seconds": 1767549727,
+    "_nanoseconds": 403000000
+  }
+}
+
+--- payments ID: 695ea1628fad78dbfa74c02b ---
+{
+  "userId": "69535b06c5a442c7b53c7671",
+  "stripeSessionId": "cs_test_a1HZSKBrq2ch5nLCGuQBt3ES4QtZ9b49EST0AGkkcXFdibLH8awPLOg5Iq",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1767809378,
+    "_nanoseconds": 492000000
+  },
+  "updatedAt": {
+    "_seconds": 1767809451,
+    "_nanoseconds": 859000000
+  }
+}
+
+--- payments ID: 696484cb3b7aa0b992ac8b72 ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a12xlHbi6WLzNwIAICwRNghk3JHd4mKhQKrEJyxZUeApg1aSJC7DZw6YfA",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768195275,
+    "_nanoseconds": 233000000
+  },
+  "updatedAt": {
+    "_seconds": 1768195302,
+    "_nanoseconds": 895000000
+  }
+}
+
+--- payments ID: 6964dc0812dc8baa4c0dfc1e ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1nNb2uToAuj0bwMjq19m1OZ4NRPOHT2wWl9w4HTdJ0UWj4VaJO4c8mUNq",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768217608,
+    "_nanoseconds": 673000000
+  },
+  "updatedAt": {
+    "_seconds": 1768217644,
+    "_nanoseconds": 617000000
+  }
+}
+
+--- payments ID: 69653c6e45de5d68329c2410 ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1Y9jZi5w4onmKpQClDKGVbm9W24obPZq0VBoWsyRCuxZkI4sCigXauyUp",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768242286,
+    "_nanoseconds": 716000000
+  },
+  "updatedAt": {
+    "_seconds": 1768242313,
+    "_nanoseconds": 802000000
+  }
+}
+
+--- payments ID: 6965dffe2c1d7235dab4f8f6 ---
+{
+  "userId": "69535b06c5a442c7b53c7671",
+  "stripeSessionId": "cs_test_a1avroIou5QOwomr8KQtAUEKmIlKnsAyTs1GHloJAdy2my2wrWkaszLbYx",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768284158,
+    "_nanoseconds": 655000000
+  },
+  "updatedAt": {
+    "_seconds": 1768284211,
+    "_nanoseconds": 776000000
+  }
+}
+
+--- payments ID: 69689e9ec26b48ffd68184d3 ---
+{
+  "userId": "69689e8fc26b48ffd68184d1",
+  "stripeSessionId": "cs_test_a1fM10zLaAxmv6vP4bYcr2sl49xye7msCI8gZW48vX6EiIjGjsTpuuTXt0",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768464030,
+    "_nanoseconds": 710000000
+  },
+  "updatedAt": {
+    "_seconds": 1768464094,
+    "_nanoseconds": 958000000
+  }
+}
+
+--- payments ID: 696a1fc8c26b48ffd68184ef ---
+{
+  "userId": "69689e8fc26b48ffd68184d1",
+  "stripeSessionId": "cs_test_a1GHiyMa0BHdcC2FSYXhkxXOHi0CSmsMZzH4Z3LBC5COpeKtP7lHZ3ZAqO",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768562632,
+    "_nanoseconds": 549000000
+  },
+  "updatedAt": {
+    "_seconds": 1768562658,
+    "_nanoseconds": 881000000
+  }
+}
+
+--- payments ID: 696a424dc26b48ffd68184fb ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1mpuDW4QTnRYFg6Rt81cB0u9jUKJixZ2kmOpcnI1XOHkAUm5ZBx3DqD61",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768571469,
+    "_nanoseconds": 945000000
+  },
+  "updatedAt": {
+    "_seconds": 1768571804,
+    "_nanoseconds": 579000000
+  }
+}
+
+--- payments ID: 696a44bbc26b48ffd6818500 ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1EoGjCUugIrj3yBw362WPMYE6bXTaGu03tZGuDNZJ0WWUabz2cvFJFSuH",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768572091,
+    "_nanoseconds": 580000000
+  },
+  "updatedAt": {
+    "_seconds": 1768572123,
+    "_nanoseconds": 626000000
+  }
+}
+
+--- payments ID: 696a6400c26b48ffd681850e ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1cAQsCXzDgsW0fJvhuUxy9rZCBM3W8srC0MiR2Ktq3VNWsjaq74G4nTN6",
+  "amount": 5300,
+  "currency": "INR",
+  "credits": 8,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1768580096,
+    "_nanoseconds": 873000000
+  },
+  "updatedAt": {
+    "_seconds": 1768580096,
+    "_nanoseconds": 873000000
+  }
+}
+
+--- payments ID: 696a6401c26b48ffd6818510 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1sgWcBueDQxmhuzSfChLklGkhdXBVOqmKtYGxkR45prFBfijWwR6GdyQz",
+  "amount": 5300,
+  "currency": "INR",
+  "credits": 8,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1768580097,
+    "_nanoseconds": 851000000
+  },
+  "updatedAt": {
+    "_seconds": 1768580097,
+    "_nanoseconds": 851000000
+  }
+}
+
+--- payments ID: 696b0a05c26b48ffd6818515 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1gxrQy1zNaejkdB2ZVpZi7OKcklEsIsXscVIcpG5oNnPWlehfsfsIkFNU",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1768622597,
+    "_nanoseconds": 345000000
+  },
+  "updatedAt": {
+    "_seconds": 1768622597,
+    "_nanoseconds": 345000000
+  }
+}
+
+--- payments ID: 696bcc3bc26b48ffd6818519 ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1yWOzPm2lVqGbciSCAKxNTqSy2n7bj4WzmEcN5C2ColEL1jVX7SjdKJmg",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768672315,
+    "_nanoseconds": 788000000
+  },
+  "updatedAt": {
+    "_seconds": 1768672340,
+    "_nanoseconds": 541000000
+  }
+}
+
+--- payments ID: 696bce98c26b48ffd681851e ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a11v7jSiIDeZfkKiyHMCWsuPKZ35fXcZlK28UmiFrYq0TWJMvaIH8f1T6R",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768672920,
+    "_nanoseconds": 660000000
+  },
+  "updatedAt": {
+    "_seconds": 1768672945,
+    "_nanoseconds": 88000000
+  }
+}
+
+--- payments ID: 696bd004c26b48ffd6818523 ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1JQk3fHYnSzrSto7uTbhsWXI2XjA8bVNLhhFk21qgVtL8TQczIwrfy1W2",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768673284,
+    "_nanoseconds": 443000000
+  },
+  "updatedAt": {
+    "_seconds": 1768673309,
+    "_nanoseconds": 38000000
+  }
+}
+
+--- payments ID: 696bd119c26b48ffd6818528 ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1HnIMpMx8cZkIZvH8N45HOyK47gzhZKYW0cwDkjM5wuOfMpeMsUSiwMlf",
+  "amount": 1450,
+  "currency": "INR",
+  "credits": 1,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1768673561,
+    "_nanoseconds": 384000000
+  },
+  "updatedAt": {
+    "_seconds": 1768673586,
+    "_nanoseconds": 134000000
+  }
+}
+
+--- payments ID: 69737fb0c26b48ffd681852e ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1ls2lOBeQgWMv1BGDkcgXztdC36o65xoofWXUnswLiKecObl2rxw1LeVl",
+  "amount": 5300,
+  "currency": "INR",
+  "credits": 8,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769177008,
+    "_nanoseconds": 870000000
+  },
+  "updatedAt": {
+    "_seconds": 1769177008,
+    "_nanoseconds": 870000000
+  }
+}
+
+--- payments ID: 69737fefc26b48ffd6818531 ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1T4TmE2QCHiF1f8OAhGaKmKy27qP29XyBqRhbeMqCQrW3URteDeZMmjUS",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769177071,
+    "_nanoseconds": 888000000
+  },
+  "updatedAt": {
+    "_seconds": 1769177096,
+    "_nanoseconds": 156000000
+  }
+}
+
+--- payments ID: 69749f03f2550058f89d09a8 ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1JXIHtdHt3qfuYDk85jMdJhsqkEGbsSenytOM8fSIB8IhgQHawsHTGrZY",
+  "amount": 5300,
+  "currency": "INR",
+  "credits": 8,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769250563,
+    "_nanoseconds": 339000000
+  },
+  "updatedAt": {
+    "_seconds": 1769250585,
+    "_nanoseconds": 536000000
+  }
+}
+
+--- payments ID: 6974a240f2550058f89d09ae ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1cHpbB0hpZ6GG4ZVxPHQgiSe3KprJmojGjvIZyedf5OT3iwB8cXzHE4wP",
+  "amount": 1450,
+  "currency": "INR",
+  "credits": 1,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769251392,
+    "_nanoseconds": 488000000
+  },
+  "updatedAt": {
+    "_seconds": 1769251414,
+    "_nanoseconds": 288000000
+  }
+}
+
+--- payments ID: 6974a241f2550058f89d09b0 ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1YIzQVvXJOB1OWk1ZsPefLmrMUgFp5wsFuV0wKMp71HyJKSjEJVbVYNYF",
+  "amount": 1450,
+  "currency": "INR",
+  "credits": 1,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769251393,
+    "_nanoseconds": 377000000
+  },
+  "updatedAt": {
+    "_seconds": 1769251393,
+    "_nanoseconds": 377000000
+  }
+}
+
+--- payments ID: 6974a291f2550058f89d09b6 ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1dGWrJ0S0aPdsvGdncxMftRyyNN6riIyxybhb9RCpN4vluwf1wYFoDLVu",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769251473,
+    "_nanoseconds": 991000000
+  },
+  "updatedAt": {
+    "_seconds": 1769251494,
+    "_nanoseconds": 695000000
+  }
+}
+
+--- payments ID: 6974a395f2550058f89d09bc ---
+{
+  "userId": "6958cae3e7559111484b7546",
+  "stripeSessionId": "cs_test_a1oJXqT0RqLD9OOXoMLreWAqs7RqBwNTT6zj5QjObdVwBlT6u4vTwkwTxF",
+  "amount": 5300,
+  "currency": "INR",
+  "credits": 8,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769251733,
+    "_nanoseconds": 369000000
+  },
+  "updatedAt": {
+    "_seconds": 1769251754,
+    "_nanoseconds": 897000000
+  }
+}
+
+--- payments ID: 6974b47600a01e1d4ad7efd6 ---
+{
+  "userId": "69689e8fc26b48ffd68184d1",
+  "stripeSessionId": "cs_test_a1vY8EZ0dkGAKjipLujJjmqNGAsyCa1NixaKRg0hXtUekPBtxLjIdEUSp3",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769256054,
+    "_nanoseconds": 436000000
+  },
+  "updatedAt": {
+    "_seconds": 1769256081,
+    "_nanoseconds": 297000000
+  }
+}
+
+--- payments ID: 6975117e00a01e1d4ad7eff0 ---
+{
+  "userId": "69689e8fc26b48ffd68184d1",
+  "stripeSessionId": "cs_test_a1BhbgKxFk2Ul36x3Egb2TOSO2fdFZ3e2exPUDD4oiP1bxOHcDKfkFSHrF",
+  "amount": 5300,
+  "currency": "INR",
+  "credits": 8,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769279870,
+    "_nanoseconds": 205000000
+  },
+  "updatedAt": {
+    "_seconds": 1769279902,
+    "_nanoseconds": 511000000
+  }
+}
+
+--- payments ID: 697512de00a01e1d4ad7eff6 ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1Zf0z6XEZVxN681759k0UewIKWNhj6l6yoZWtcjyHBjxGzExtkkfhpARn",
+  "amount": 1450,
+  "currency": "INR",
+  "credits": 1,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769280222,
+    "_nanoseconds": 469000000
+  },
+  "updatedAt": {
+    "_seconds": 1769280222,
+    "_nanoseconds": 469000000
+  }
+}
+
+--- payments ID: 6975c39600a01e1d4ad7effa ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1FhoTZHSBed5qcxDZh3MmynH4iDtEHKab0IEsjwUdKi0VjLedEPzUQffx",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769325462,
+    "_nanoseconds": 234000000
+  },
+  "updatedAt": {
+    "_seconds": 1769325506,
+    "_nanoseconds": 87000000
+  }
+}
+
+--- payments ID: 6975c85400a01e1d4ad7f000 ---
+{
+  "userId": "69689e8fc26b48ffd68184d1",
+  "stripeSessionId": "cs_test_a1ofYoUwcLsr8ofxSnv8yuIFbffv6Z5q4avJ4X86IEfOGJO92hOFKqB67b",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769326676,
+    "_nanoseconds": 196000000
+  },
+  "updatedAt": {
+    "_seconds": 1769326698,
+    "_nanoseconds": 986000000
+  }
+}
+
+--- payments ID: 69765b3100a01e1d4ad7f00e ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1676koVWPVG8T1gxED1Y3oQHNfALA0rdz29Kxci4EglFVhJkm5lw4W07A",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769364273,
+    "_nanoseconds": 992000000
+  },
+  "updatedAt": {
+    "_seconds": 1769364273,
+    "_nanoseconds": 992000000
+  }
+}
+
+--- payments ID: 69765b3200a01e1d4ad7f010 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1p1xb70yKTQ8Ekz1Nam1zP3CxTRifYwbHnBInguqFyqFBcxtd4x8IPGMl",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769364274,
+    "_nanoseconds": 686000000
+  },
+  "updatedAt": {
+    "_seconds": 1769364274,
+    "_nanoseconds": 686000000
+  }
+}
+
+--- payments ID: 69765bb400a01e1d4ad7f013 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1dF2MqezHgd4DpvIQNuh4aGsIa34PMQaclbKiZ8rjyCasZDoUq00fASEq",
+  "amount": 7950,
+  "currency": "INR",
+  "credits": 15,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769364404,
+    "_nanoseconds": 973000000
+  },
+  "updatedAt": {
+    "_seconds": 1769364441,
+    "_nanoseconds": 355000000
+  }
+}
+
+--- payments ID: 69775ed400a01e1d4ad7f01b ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1SppcE0E7G1p9Nkk55hDoBMazvPMRGR3rJLgEiBz7hIY5FUCcwelJdmQ0",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769430740,
+    "_nanoseconds": 718000000
+  },
+  "updatedAt": {
+    "_seconds": 1769430770,
+    "_nanoseconds": 209000000
+  }
+}
+
+--- payments ID: 697b312f00a01e1d4ad7f02e ---
+{
+  "userId": "697b312300a01e1d4ad7f02c",
+  "stripeSessionId": "cs_test_a1Qw4fPBkVNGLyEYyKE1ABBoh62ajO6zu6bNyG8O3dUNhAITRcme78HuHi",
+  "amount": 7950,
+  "currency": "INR",
+  "credits": 15,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769681199,
+    "_nanoseconds": 983000000
+  },
+  "updatedAt": {
+    "_seconds": 1769681199,
+    "_nanoseconds": 983000000
+  }
+}
+
+--- payments ID: 697b313000a01e1d4ad7f030 ---
+{
+  "userId": "697b312300a01e1d4ad7f02c",
+  "stripeSessionId": "cs_test_a1q7Xf4QxRSiaB8zJx1OZnZBYobYylevQUWcO7MitcJtZ35phVf3zAaWT8",
+  "amount": 7950,
+  "currency": "INR",
+  "credits": 15,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769681200,
+    "_nanoseconds": 391000000
+  },
+  "updatedAt": {
+    "_seconds": 1769681200,
+    "_nanoseconds": 391000000
+  }
+}
+
+--- payments ID: 697b316700a01e1d4ad7f033 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1aMgDQAOUdrg7vEpGHOhIGN47aWz0YJqu9M11n2K7jAZhayqyqHfFyOTq",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769681255,
+    "_nanoseconds": 703000000
+  },
+  "updatedAt": {
+    "_seconds": 1769681290,
+    "_nanoseconds": 864000000
+  }
+}
+
+--- payments ID: 697ce81ebfce7be0ee3033dc ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1DoN3ND1Psj22BKj17kv1jrQ2ndw5MDfdk4g2gHOhgZs4gp8kZgSlYosF",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769793566,
+    "_nanoseconds": 438000000
+  },
+  "updatedAt": {
+    "_seconds": 1769793566,
+    "_nanoseconds": 438000000
+  }
+}
+
+--- payments ID: 697d788a43c5a8d0d5842a58 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1lVvgPVzHnIEn8ENbdBo6Sww4oYvzOY6TNOY1flVPpr00gx16pAfLKts1",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769830538,
+    "_nanoseconds": 548000000
+  },
+  "updatedAt": {
+    "_seconds": 1769830538,
+    "_nanoseconds": 548000000
+  }
+}
+
+--- payments ID: 697d7950b5dbc81ef21dd60b ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1fMlr88b93a2qnQZ1yymNnIb5R82pNhM0ZJzzBsOaY4CEGj43mq0EzwcE",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769830736,
+    "_nanoseconds": 291000000
+  },
+  "updatedAt": {
+    "_seconds": 1769830768,
+    "_nanoseconds": 765000000
+  }
+}
+
+--- payments ID: 697e14793993c9ce8a785979 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1lVQCvmQxXrqddqcVUfqw2jPhNpKgesqHmTmIKYgUQBu3EfFGo8sycjjQ",
+  "amount": 1450,
+  "currency": "INR",
+  "credits": 1,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769870457,
+    "_nanoseconds": 603000000
+  },
+  "updatedAt": {
+    "_seconds": 1769870457,
+    "_nanoseconds": 603000000
+  }
+}
+
+--- payments ID: 697e20e39bb37d70a3eb393f ---
+{
+  "userId": "697b312300a01e1d4ad7f02c",
+  "stripeSessionId": "cs_test_a1wDhUU4CcMCP2hPLPx93XbYwz9ga6tlW5ZOfQEY3GY0vDdGywKOsJBvxu",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769873635,
+    "_nanoseconds": 47000000
+  },
+  "updatedAt": {
+    "_seconds": 1769873635,
+    "_nanoseconds": 47000000
+  }
+}
+
+--- payments ID: 697e31a39bb37d70a3eb3943 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1S0Q8T9PGB1GnpjLGTaWKDvQ3fSj3yeEP41zchOpYVTuGrgdFU5eXUb1W",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769877923,
+    "_nanoseconds": 196000000
+  },
+  "updatedAt": {
+    "_seconds": 1769877923,
+    "_nanoseconds": 196000000
+  }
+}
+
+--- payments ID: 697e31fe9bb37d70a3eb3945 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1wWfMf1lK6Mv5XuAvywEs0WIWktprnOieLzTQa3Oak4TqAOXIUOdhTfSu",
+  "amount": 5300,
+  "currency": "INR",
+  "credits": 8,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769878014,
+    "_nanoseconds": 370000000
+  },
+  "updatedAt": {
+    "_seconds": 1769878014,
+    "_nanoseconds": 370000000
+  }
+}
+
+--- payments ID: 697e32d6405295cfacfc3fb2 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1LhEaYiNWM6F4bGq2gs4CUCGkB3zdWn5ynPVl7ClfhDNSdrj7aieYFO5f",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769878230,
+    "_nanoseconds": 428000000
+  },
+  "updatedAt": {
+    "_seconds": 1769878230,
+    "_nanoseconds": 428000000
+  }
+}
+
+--- payments ID: 697e32d6405295cfacfc3fb4 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1QjOFmQxUK54wkJ59PpQSthGDLRq6TGv5sJoTmlMBBde3inxx4kSdRwWz",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769878230,
+    "_nanoseconds": 483000000
+  },
+  "updatedAt": {
+    "_seconds": 1769878230,
+    "_nanoseconds": 483000000
+  }
+}
+
+--- payments ID: 697e353677c374286d58f123 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1Peh93KgDiebww5hnbrDg7eZ3eEWp9owdtKqAsa92CU9pm8i9QcZQaiQ7",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769878838,
+    "_nanoseconds": 531000000
+  },
+  "updatedAt": {
+    "_seconds": 1769878838,
+    "_nanoseconds": 531000000
+  }
+}
+
+--- payments ID: 697e36ea016b0dfd46dfe89e ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a15lDjvIL0VzoOC8VC6pjgfbMEFCaENBgmZBFmdjRNscJKiJUZVMB5nHVY",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769879274,
+    "_nanoseconds": 275000000
+  },
+  "updatedAt": {
+    "_seconds": 1769879274,
+    "_nanoseconds": 275000000
+  }
+}
+
+--- payments ID: 697e3732016b0dfd46dfe8a0 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1KAGlcUzPXdjNWIdV5WBkBIgmNyriviZ6VzL61zVnSUyQcuEDYSjtJt2j",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769879346,
+    "_nanoseconds": 255000000
+  },
+  "updatedAt": {
+    "_seconds": 1769879346,
+    "_nanoseconds": 255000000
+  }
+}
+
+--- payments ID: 697e3d36ba9ca90bb9ff28ac ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1F8AVdazbspAK7g2DIKCc5h3c3kGR9Q8uQOylHXlZ2LddzFcEyjkWPCgq",
+  "amount": 10900,
+  "currency": "INR",
+  "credits": 18,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769880886,
+    "_nanoseconds": 57000000
+  },
+  "updatedAt": {
+    "_seconds": 1769880886,
+    "_nanoseconds": 57000000
+  }
+}
+
+--- payments ID: 697ed4e2b82a9a1d70435e16 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1WavS4LpqPhwnqOO9BIQ4gyxBuRJE9E1byO29vY4ykR0PmkAaWCvwiH18",
+  "amount": 1450,
+  "currency": "INR",
+  "credits": 1,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1769919714,
+    "_nanoseconds": 154000000
+  },
+  "updatedAt": {
+    "_seconds": 1769919714,
+    "_nanoseconds": 154000000
+  }
+}
+
+--- payments ID: 697ee7283b26e37e140e86a8 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1kpH8HVDPWIv3AajnTfVi9mzP4ikfaVBBLnJO7rHT8mmhMIBlYBZLKZn2",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769924392,
+    "_nanoseconds": 168000000
+  },
+  "updatedAt": {
+    "_seconds": 1769924426,
+    "_nanoseconds": 306000000
+  }
+}
+
+--- payments ID: 697efed13b26e37e140e86af ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1ZggtmodRUm6iOXSU2h8ZRievLGdRYKfcAVN1jeFv2y9UfsJ9HQfmtU0d",
+  "amount": 7950,
+  "currency": "INR",
+  "credits": 15,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769930449,
+    "_nanoseconds": 242000000
+  },
+  "updatedAt": {
+    "_seconds": 1769930479,
+    "_nanoseconds": 414000000
+  }
+}
+
+--- payments ID: 697f024c6319159cfc0ed80b ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1D6KQh2JyDMG7CpCEExNPBmsxxK7mGwYbH1UWMmW7ZcEFelIR2ZC6hYha",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1769931340,
+    "_nanoseconds": 376000000
+  },
+  "updatedAt": {
+    "_seconds": 1769931385,
+    "_nanoseconds": 814000000
+  }
+}
+
+--- payments ID: 69835282320b9f36f95c63f2 ---
+{
+  "userId": "697760bc00a01e1d4ad7f022",
+  "stripeSessionId": "cs_test_a1kQKCsDpGSq50lyl1MQXYMqvVRKMOJV3LJELBRgEmHJz8ynMawXIE2BYn",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1770214018,
+    "_nanoseconds": 684000000
+  },
+  "updatedAt": {
+    "_seconds": 1770214050,
+    "_nanoseconds": 362000000
+  }
+}
+
+--- payments ID: 6983e9011e4f87ccf4f079c2 ---
+{
+  "userId": "697f3ee16319159cfc0ed812",
+  "stripeSessionId": "cs_test_a1iNIi6YNvfO94ZVuR265PsZ2Crz8rQErNI2VJkbnQMzqK4S6tpLnHpcvE",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1770252545,
+    "_nanoseconds": 703000000
+  },
+  "updatedAt": {
+    "_seconds": 1770252566,
+    "_nanoseconds": 840000000
+  }
+}
+
+--- payments ID: 6988a5efcb9b715812a6bce1 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1UvURjEeNlxQaCHWiwmTVeFHsZfD8TF2UIApPfcDtf5z27GnfexS7wSHD",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1770563055,
+    "_nanoseconds": 462000000
+  },
+  "updatedAt": {
+    "_seconds": 1770563077,
+    "_nanoseconds": 93000000
+  }
+}
+
+--- payments ID: 6988acdb30e9a733c3c4b692 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1NxtwFgNgC8UxKOnHJe2tOlmYNAMVjd0lQmA9KQRHBHZYGdCKVBK9BOmW",
+  "amount": 10900,
+  "currency": "INR",
+  "credits": 18,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1770564827,
+    "_nanoseconds": 699000000
+  },
+  "updatedAt": {
+    "_seconds": 1770564854,
+    "_nanoseconds": 29000000
+  }
+}
+
+--- payments ID: 6988bd3830e9a733c3c4b698 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1Kl6OyUibq5NlnHO8LJcHCtdtZNN3PUnU82rnvUbxEZTN6HBRjT1Lhvrt",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1770569016,
+    "_nanoseconds": 658000000
+  },
+  "updatedAt": {
+    "_seconds": 1770569036,
+    "_nanoseconds": 191000000
+  }
+}
+
+--- payments ID: 698af36330e9a733c3c4b6a4 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1X9tCvqO5zYEx3RbHbbDRRHf3Lw2jzTJ9FK4oj7HCwtQmkaQZqT2GuhiL",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1770713955,
+    "_nanoseconds": 924000000
+  },
+  "updatedAt": {
+    "_seconds": 1770713985,
+    "_nanoseconds": 314000000
+  }
+}
+
+--- payments ID: 698b304930e9a733c3c4b6ac ---
+{
+  "userId": "698b303c30e9a733c3c4b6aa",
+  "stripeSessionId": "cs_test_a1ex8ZJ8EmUF24RDgMDi92eIkS1vr2V4dvpddIXUqHFTnMg5T66yEWy90g",
+  "amount": 5300,
+  "currency": "INR",
+  "credits": 8,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1770729545,
+    "_nanoseconds": 4000000
+  },
+  "updatedAt": {
+    "_seconds": 1770729585,
+    "_nanoseconds": 709000000
+  }
+}
+
+--- payments ID: 698c768a30e9a733c3c4b6bb ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1nLfVAaa8qorWOxkO25VYJk0HfeNzEmWQJGjp1BcdxlgJC4ZOXwQRmZju",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1770813066,
+    "_nanoseconds": 923000000
+  },
+  "updatedAt": {
+    "_seconds": 1770813101,
+    "_nanoseconds": 428000000
+  }
+}
+
+--- payments ID: 698c768b30e9a733c3c4b6bd ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1GCihtaZPKN3dljCp2Nsd5UxqqtxTJJ94rvKeOIfqjy4CuJCBunARVHlZ",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1770813067,
+    "_nanoseconds": 299000000
+  },
+  "updatedAt": {
+    "_seconds": 1770813067,
+    "_nanoseconds": 299000000
+  }
+}
+
+--- payments ID: 69a0743230e9a733c3c4b728 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1viE71djXRTVmD2yeRM9vNCkl2Oc0LvwT1lJfOpSh4ZGOJzjufyFdL3Vv",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1772123186,
+    "_nanoseconds": 155000000
+  },
+  "updatedAt": {
+    "_seconds": 1772123212,
+    "_nanoseconds": 727000000
+  }
+}
+
+--- payments ID: 69b429e430e9a733c3c4b757 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1VXtAAsxCUnUk3lTbnZCKpbpn2GRoP6VSNf8vGQpB8FgRgUAsV1PqbvnN",
+  "amount": 1450,
+  "currency": "INR",
+  "credits": 1,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1773414884,
+    "_nanoseconds": 74000000
+  },
+  "updatedAt": {
+    "_seconds": 1773414915,
+    "_nanoseconds": 657000000
+  }
+}
+
+--- payments ID: 69b5ac3c22165445c03d0e51 ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1fIzCOhwAFVemUUj9Odcp7NxQRrNpXmqP0Rf54GqLFpvzS0RPMM3tDiyY",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1773513788,
+    "_nanoseconds": 824000000
+  },
+  "updatedAt": {
+    "_seconds": 1773513889,
+    "_nanoseconds": 528000000
+  }
+}
+
+--- payments ID: 69bad54bef851d5cd090cf5e ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1aAWYGu5pswNjSb71JaIuAJEDxy18rXvAYQI2Jrt9LPmjxu7IKKhQ2pEa",
+  "amount": 5300,
+  "currency": "INR",
+  "credits": 8,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1773851979,
+    "_nanoseconds": 595000000
+  },
+  "updatedAt": {
+    "_seconds": 1773851979,
+    "_nanoseconds": 595000000
+  }
+}
+
+--- payments ID: 69bad5dee69409a0d1639d4c ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a19XVv9gh9NbJl39zEyLy17qiII9yxhvXKu8pXZg9JO4EKqRiJYdZJYqbT",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1773852126,
+    "_nanoseconds": 15000000
+  },
+  "updatedAt": {
+    "_seconds": 1773852151,
+    "_nanoseconds": 297000000
+  }
+}
+
+--- payments ID: 69be81c52b5d660598b1e630 ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1dappVbMphrQNbdexaobLfNhqTyjtQk5Zs1umgmnpiF5Xx2z5CUgcLXIA",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1774092741,
+    "_nanoseconds": 418000000
+  },
+  "updatedAt": {
+    "_seconds": 1774092767,
+    "_nanoseconds": 191000000
+  }
+}
+
+--- payments ID: 69be82072b5d660598b1e63a ---
+{
+  "userId": "6952c71ea83c744beed44e6d",
+  "stripeSessionId": "cs_test_a1nISQA8UyOKIa1tkfJnqMcPpTrY3TWCTojSEVNY0TVU4SznMVCHP7jxwE",
+  "amount": 10900,
+  "currency": "INR",
+  "credits": 18,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1774092807,
+    "_nanoseconds": 924000000
+  },
+  "updatedAt": {
+    "_seconds": 1774092824,
+    "_nanoseconds": 53000000
+  }
+}
+
+--- payments ID: 69beddfe14c76b7df9ea82d7 ---
+{
+  "userId": "69bedde914c76b7df9ea82d3",
+  "stripeSessionId": "cs_test_a1JVB0v7tkvInoHa7VBybF6sTjCKSd1zdaacN44ZlmXRaemcNcmrYkgDA0",
+  "amount": 5300,
+  "currency": "INR",
+  "credits": 8,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1774116350,
+    "_nanoseconds": 418000000
+  },
+  "updatedAt": {
+    "_seconds": 1774116381,
+    "_nanoseconds": 492000000
+  }
+}
+
+--- payments ID: 69c25155df3141971425c1b3 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1DlSIRmYBYkAuVFqs4gdakjDmKPGToMk2i3re6OGJbVVVgaD4zxsRJ9Rc",
+  "amount": 1450,
+  "currency": "INR",
+  "credits": 1,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1774342485,
+    "_nanoseconds": 173000000
+  },
+  "updatedAt": {
+    "_seconds": 1774342529,
+    "_nanoseconds": 514000000
+  }
+}
+
+--- payments ID: 69c4f9b292c240066e2bb3c4 ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1Gyv3uKH7VcQkbOWHuMLTssxvEWqxWnieNAUqlsUrvs1O4LCyOuaKS5JG",
+  "amount": 5300,
+  "currency": "INR",
+  "credits": 8,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1774516658,
+    "_nanoseconds": 362000000
+  },
+  "updatedAt": {
+    "_seconds": 1774516726,
+    "_nanoseconds": 18000000
+  }
+}
+
+--- payments ID: 69c9e0bfdd182013b0de23e9 ---
+{
+  "userId": "69b2ee6330e9a733c3c4b750",
+  "stripeSessionId": "cs_test_a1vYDycFJrCVZH9juD78YnVc3OJ1nDzRXxiwdGetKnAYSDvb3tMHCgE2Ln",
+  "amount": 7950,
+  "currency": "INR",
+  "credits": 15,
+  "status": "pending",
+  "createdAt": {
+    "_seconds": 1774837951,
+    "_nanoseconds": 52000000
+  },
+  "updatedAt": {
+    "_seconds": 1774837951,
+    "_nanoseconds": 52000000
+  }
+}
+
+--- payments ID: 69d2677492f13158d03db8ca ---
+{
+  "userId": "696a6372c26b48ffd681850c",
+  "stripeSessionId": "cs_test_a1sWFUE01ukFk6cfOVWzusTb7fBvqP3aQ2DRih61H1yLrtoW0s02ZOtYJK",
+  "amount": 2650,
+  "currency": "INR",
+  "credits": 3,
+  "status": "paid",
+  "createdAt": {
+    "_seconds": 1775396724,
+    "_nanoseconds": 385000000
+  },
+  "updatedAt": {
+    "_seconds": 1775396752,
+    "_nanoseconds": 432000000
+  }
+}
+
+========== Total payments: 83 ==========
+

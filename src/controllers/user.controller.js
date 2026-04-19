@@ -1,33 +1,38 @@
 import * as userService from "../Services/UserService.js";
-import crypto from "crypto";
-import User from "../Model/User.js";
+import db from "../config/db.js"; 
 
-
-
-/* ================= GET PROFILE (CACHEABLE) ================= */
+/* ================= GET PROFILE (CACHEABLE - OPTIMIZED) ================= */
 
 export const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // ✅ VERY LIGHT QUERY (only updatedAt)
-    const meta = await User.findById(userId)
-      .select("updatedAt")
-      .lean();
+    // 🔥 OPTIMIZATION 1: Fetch the user document ONCE
+    const userDoc = await db.collection("users").doc(userId).get();
 
-    if (!meta) {
+    if (!userDoc.exists) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const etag = meta.updatedAt?.toISOString();
+    const meta = userDoc.data();
+    
+    // Safely handle Firestore Timestamp or standard JS Date objects
+    let updatedStr = "new";
+    if (meta.updatedAt) {
+      updatedStr = typeof meta.updatedAt.toDate === 'function' 
+        ? meta.updatedAt.toDate().toISOString() 
+        : new Date(meta.updatedAt).toISOString();
+    }
 
-    // ✅ RETURN EARLY (NO FULL DB CALL)
+    const etag = updatedStr;
+
+    // ✅ SHORT-CIRCUIT: If ETag matches, return early
     if (req.headers["if-none-match"] === etag) {
       return res.status(304).end(); // ⚡ ~10ms
     }
 
-    // ❗ Only now fetch full data
-    const user = await userService.getUserById(userId);
+    // 🔥 OPTIMIZATION 2: Pass the pre-fetched document to the service
+    const user = await userService.getUserById(userId, userDoc);
 
     res.set("ETag", etag);
     res.set("Cache-Control", "private, max-age=60");
@@ -50,8 +55,6 @@ export const updateProfile = async (req, res) => {
       req.body
     );
 
-  
-
     return res.json({
       message: "Profile updated successfully",
       user: updatedUser,
@@ -62,33 +65,42 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-/* ================= GET USER CREDITS (CACHEABLE) ================= */
+/* ================= GET USER CREDITS (CACHEABLE - OPTIMIZED) ================= */
 
 export const fetchUserCredits = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // ✅ ONLY FETCH updatedAt + credits
-    const meta = await User.findById(userId)
-      .select("updatedAt credits")
-      .lean();
+    // 🔥 OPTIMIZATION 1: Fetch document ONCE
+    const userDoc = await db.collection("users").doc(userId).get();
 
-    if (!meta) {
+    if (!userDoc.exists) {
       return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
 
-    const etag = `${meta.updatedAt?.toISOString()}-${meta.credits}`;
+    const meta = userDoc.data();
+    
+    // Safely parse timestamp
+    let updatedStr = "new";
+    if (meta.updatedAt) {
+      updatedStr = typeof meta.updatedAt.toDate === 'function' 
+        ? meta.updatedAt.toDate().toISOString() 
+        : new Date(meta.updatedAt).toISOString();
+    }
+
+    const credits = meta.credits || 0;
+    const etag = `${updatedStr}-${credits}`;
 
     // ✅ EARLY RETURN
     if (req.headers["if-none-match"] === etag) {
       return res.status(304).end(); // ⚡ no DB/service call
     }
 
-    // ❗ Only now call service
-    const data = await userService.getUserCredits(userId);
+    // 🔥 OPTIMIZATION 2: Pass the pre-fetched document to the service
+    const data = await userService.getUserCredits(userId, userDoc);
 
     res.set("ETag", etag);
     res.set("Cache-Control", "private, max-age=30"); // shorter for credits

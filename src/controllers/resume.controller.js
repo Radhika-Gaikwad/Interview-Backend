@@ -1,10 +1,7 @@
-import Resume from "../Model/Resume.js";
 import * as resumeService from "../Services/resume.service.js";
 import { bucket } from "../utils/gcs.js";
 import path from "path";
-import crypto from "crypto";
-
-
+import db from "../config/db.js";
 
 /* ================= CREATE ================= */
 
@@ -19,7 +16,6 @@ export const createResume = async (req, res) => {
       email,
     });
 
-
     res.status(201).json(resume);
   } catch (err) {
     console.error("Create resume error:", err);
@@ -27,62 +23,58 @@ export const createResume = async (req, res) => {
   }
 };
 
-/* ================= LIST (CACHEABLE) ================= */
-
 export const getResumes = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 6;
 
-    // ✅ VERY LIGHT QUERY (only updatedAt)
-    const latest = await Resume.find({
-      user: userId,
-      isDeleted: false,
-    })
-      .select("updatedAt")
-      .sort({ updatedAt: -1 })
+    // 1. FAST CHECK: Get only the latest updated doc to generate ETag
+    // This avoids downloading all IDs and timestamps for every request.
+    const latestDocSnapshot = await db.collection("resumes")
+      .where("user", "==", userId)
+      .where("isDeleted", "==", false)
+      .orderBy("updatedAt", "desc")
       .limit(1)
-      .lean();
+      .get();
 
-    const lastUpdated = latest[0]?.updatedAt?.toISOString() || "empty";
-
-    const etag = `${userId}-${page}-${limit}-${lastUpdated}`;
-
-    // ✅ SHORT-CIRCUIT HERE
-    if (req.headers["if-none-match"] === etag) {
-      return res.status(304).end(); // ⚡ NO DB HEAVY CALL
+    let etag = `${userId}-${page}-${limit}-empty`;
+    if (!latestDocSnapshot.empty) {
+      const lastUpdate = latestDocSnapshot.docs[0].data().updatedAt?.toMillis() || 0;
+      etag = `${userId}-${page}-${limit}-${lastUpdate}`;
     }
 
-    // ❗ Only now run heavy query
+    // 2. Browser Cache Validation
+    if (req.headers["if-none-match"] === etag) {
+      return res.status(304).end();
+    }
+
+    // 3. Fetch only the data needed for this specific page
     const result = await resumeService.getResumes(userId, page, limit);
 
     res.set("ETag", etag);
-    res.set("Cache-Control", "private, max-age=60");
-
+    res.set("Cache-Control", "private, max-age=120"); // Increased to 2 mins
     res.json(result);
   } catch (err) {
     console.error("Get resumes error:", err);
     res.status(500).json({ error: err.message });
   }
 };
-
 /* ================= VIEW (CACHEABLE - SHORT TTL) ================= */
 
 export const viewResume = async (req, res) => {
   try {
     const resumeId = req.params.id;
 
-    // ✅ Only fetch updatedAt (VERY FAST)
-    const meta = await Resume.findById(resumeId)
-      .select("updatedAt previewPdfPath resumePath")
-      .lean();
+    // ✅ FIREBASE WAY: Direct document read
+    const doc = await db.collection("resumes").doc(resumeId).get();
 
-    if (!meta) {
+    if (!doc.exists) {
       return res.status(404).json({ error: "Resume not found" });
     }
 
-    const etag = meta.updatedAt?.toISOString();
+    const meta = doc.data();
+    const etag = meta.updatedAt ? meta.updatedAt.toDate().toISOString() : "new";
 
     // ✅ RETURN EARLY (NO GCS CALL)
     if (req.headers["if-none-match"] === etag) {
@@ -113,18 +105,19 @@ export const viewResume = async (req, res) => {
 
 export const downloadResume = async (req, res) => {
   try {
-    const resume = await Resume.findById(req.params.id);
+    const doc = await db.collection("resumes").doc(req.params.id).get();
 
-    if (!resume) {
+    if (!doc.exists) {
       return res.status(404).json({ error: "Resume not found" });
     }
 
+    const resume = doc.data();
     const file = bucket.file(resume.resumePath);
 
     const [url] = await file.getSignedUrl({
       action: "read",
       expires: Date.now() + 15 * 60 * 1000,
-      responseDisposition: `attachment; filename="${resume.title}${path.extname(resume.resumePath)}"`
+      responseDisposition: `attachment; filename="${resume.title}${path.extname(resume.resumePath)}"`,
     });
 
     return res.json({ url });

@@ -1,7 +1,6 @@
 import sessionService from "../Services/sessionService.js";
-import Session from "../Model/Session.js";
+import db from "../config/db.js";
 import crypto from "crypto";
-
 
 /* ================= CREATE ================= */
 
@@ -25,15 +24,20 @@ export const getSession = async (req, res) => {
   try {
     const session = await sessionService.getSessionById(req.params.id);
 
-    // ✅ lightweight hash (no stringify of huge object ideally)
+    let updatedStr = "new";
+    if (session.updatedAt) {
+      updatedStr = typeof session.updatedAt.toDate === 'function'
+        ? session.updatedAt.toDate().toISOString()
+        : new Date(session.updatedAt).toISOString();
+    }
+
     const etag = crypto
       .createHash("md5")
-      .update(session.updatedAt?.toISOString() || JSON.stringify(session))
+      .update(updatedStr || JSON.stringify(session))
       .digest("hex");
 
-    // ✅ compare BEFORE sending response
     if (req.headers["if-none-match"] === etag) {
-      return res.status(304).end(); // ⚡ instant return
+      return res.status(304).end();
     }
 
     res.set("ETag", etag);
@@ -44,34 +48,38 @@ export const getSession = async (req, res) => {
     res.status(404).json({ message: err.message });
   }
 };
-/* ================= LIST (CACHEABLE) ================= */
+
+/* ================= LIST (NATIVE FIREBASE SPEED) ================= */
 
 export const listMySessions = async (req, res) => {
   try {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 6;
+    const userId = req.user.id;
 
-    // ✅ Only fetch minimal data for ETag check
-    const minimal = await Session.find({ owner: req.user.id })
-      .select("updatedAt")
-      .sort({ updatedAt: -1 })
+    // ⚡ NATIVE FIREBASE: Fetch ONLY the single most recently updated session
+    // NOTE: This REQUIRES a composite index in Firebase!
+    const latestSnapshot = await db.collection("sessions")
+      .where("owner", "==", userId)
+      .orderBy("updatedAt", "desc")
       .limit(1)
-      .lean();
+      .get();
 
-    const lastUpdated = minimal[0]?.updatedAt?.toISOString() || "empty";
-
-    const etag = `${req.user.id}-${page}-${limit}-${lastUpdated}`;
-
-    if (req.headers["if-none-match"] === etag) {
-      return res.status(304).end(); // ⚡ no heavy query
+    let lastUpdatedStr = "empty";
+    if (!latestSnapshot.empty) {
+      const meta = latestSnapshot.docs[0].data();
+      lastUpdatedStr = meta.updatedAt ? meta.updatedAt.toDate().toISOString() : "empty";
     }
 
-    // ❗ Only now run heavy query
-    const result = await sessionService.listSessionsForUser(
-      req.user.id,
-      page,
-      limit
-    );
+    const etag = `${userId}-${page}-${limit}-${lastUpdatedStr}`;
+
+    // Short-circuit if nothing changed
+    if (req.headers["if-none-match"] === etag) {
+      return res.status(304).end();
+    }
+
+    // Pass request to the service
+    const result = await sessionService.listSessionsForUser(userId, page, limit);
 
     res.set("ETag", etag);
     res.set("Cache-Control", "private, max-age=60");
@@ -123,7 +131,6 @@ export const startSession = async (req, res) => {
       userId: req.user.id,
       options: req.body,
     });
-
 
     res.json(result);
   } catch (err) {

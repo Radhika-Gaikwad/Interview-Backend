@@ -1,0 +1,11 @@
+--- Database Audit: answerflow-ai ---
+Date: 12/4/2026, 5:20:08 pm
+
+Collection: users -> ERROR: 9 FAILED_PRECONDITION: Firestore API data access is disabled. Please enable it if you want to access the database through Firestore API.
+------------------------------
+Collection: resumes -> ERROR: 9 FAILED_PRECONDITION: Firestore API data access is disabled. Please enable it if you want to access the database through Firestore API.
+------------------------------
+Collection: payments -> ERROR: 9 FAILED_PRECONDITION: Firestore API data access is disabled. Please enable it if you want to access the database through Firestore API.
+------------------------------
+Collection: sessions -> ERROR: 9 FAILED_PRECONDITION: Firestore API data access is disabled. Please enable it if you want to access the database through Firestore API.
+------------------------------

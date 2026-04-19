@@ -1,20 +1,16 @@
 import { signJwt as generateToken, getJwtExpiryMs } from "../utils/jwt.utils.js";
 import authService from "../Services/AuthService.js";
 
-
-
-
 // ================= SIGNUP =================
 export const signup = async (req, res) => {
   try {
     const user = await authService.registerUser(req.body);
 
     const token = generateToken({
-      userId: user._id.toString(),
+      userId: user._id, // Removed .toString() - Firestore IDs are native strings
       email: user.email,
       role: user.role,
     });
-
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -42,11 +38,10 @@ export const login = async (req, res) => {
     );
 
     const token = generateToken({
-      userId: user._id.toString(),
+      userId: user._id, 
       email: user.email,
       role: user.role,
     });
-
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -67,7 +62,7 @@ export const socialAuth = async (req, res) => {
     const user = await authService.socialLogin(req.body);
 
     const token = generateToken({
-      userId: user._id.toString(),
+      userId: user._id,
       email: user.email,
       role: user.role,
     });
@@ -118,7 +113,6 @@ export const changePassword = async (req, res) => {
   }
 
   await authService.changePassword(req.user.id, newPassword);
-
 
   res.clearCookie("token");
 

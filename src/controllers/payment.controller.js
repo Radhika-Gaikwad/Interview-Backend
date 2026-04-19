@@ -1,8 +1,4 @@
-import paymentService from "../Services/paymentService.js";
-import Stripe from "stripe";
-
-
-
+import paymentService, { getStripe } from "../Services/paymentService.js";
 
 /* ================= CREATE CHECKOUT ================= */
 
@@ -46,7 +42,8 @@ export const verifyCheckout = async (req, res) => {
       return res.status(400).json({ message: "Missing session_id" });
     }
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    // 🔥 OPTIMIZATION: Reuse the single Stripe instance
+    const stripe = getStripe();
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
@@ -54,11 +51,10 @@ export const verifyCheckout = async (req, res) => {
       // Fulfill payment (idempotent inside service)
       const result = await paymentService.fulfillPayment(session);
 
-    
-
       return res.json({
         ok: true,
-        creditsAdded: result?.credits || true,
+        // 🔥 FIXED: Safely grab the credits returned from the service
+        creditsAdded: result?.credits || 0,
       });
     }
 
@@ -80,7 +76,8 @@ export const stripeWebhook = async (req, res) => {
   let event;
 
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    // 🔥 OPTIMIZATION: Reuse the single Stripe instance
+    const stripe = getStripe();
 
     event = stripe.webhooks.constructEvent(
       req.body,
@@ -99,8 +96,6 @@ export const stripeWebhook = async (req, res) => {
 
       // Fulfill payment (idempotent)
       await paymentService.fulfillPayment(session);
-
-    
     }
 
     return res.json({ received: true });

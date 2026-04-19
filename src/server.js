@@ -8,7 +8,7 @@ import helmet from "helmet";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
 
-import connectDB from "./config/db.js";
+// 👇 We removed the old connectDB import here!
 
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
@@ -19,9 +19,6 @@ import uploadRoutes from "./routes/upload.routes.js";
 import * as paymentController from "./controllers/payment.controller.js";
 
 const app = express();
-
-/* ================= DB ================= */
-connectDB();
 
 /* ================= SECURITY ================= */
 
@@ -77,7 +74,6 @@ app.post(
 
 // Limit payload size (🔥 prevents abuse)
 app.use(express.json({ limit: "10kb" }));
-
 app.use(cookieParser());
 
 /* ================= ROUTES ================= */

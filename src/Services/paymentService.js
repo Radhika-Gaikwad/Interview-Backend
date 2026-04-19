@@ -1,9 +1,12 @@
 import Stripe from "stripe";
-import Payment from "../Model/Payment.js";
-import User from "../Model/User.js";
+import admin from "firebase-admin";
+import db from "../config/db.js";
+import { formatPaymentData } from "../Model/Payment.js";
 
+// 🔥 OPTIMIZATION: Singleton pattern for Stripe. 
+// We export this so the controller can reuse this exact instance instead of booting new ones.
 let _stripe;
-function getStripe() {
+export function getStripe() {
   if (_stripe) return _stripe;
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
@@ -40,13 +43,14 @@ const createCheckoutSession = async ({ user, plan }) => {
     success_url: successUrl,
     cancel_url: cancelUrl,
     metadata: {
-      userId: user._id.toString(), // ✅ safe now
+      userId: user._id, 
       credits: plan.credits.toString(),
     },
   });
 
-  // Save payment record
-  await Payment.create({
+  // Save payment record to Firestore
+  const paymentRef = db.collection("payments").doc();
+  const paymentData = formatPaymentData({
     userId: user._id,
     stripeSessionId: session.id,
     amount: plan.amount,
@@ -55,17 +59,42 @@ const createCheckoutSession = async ({ user, plan }) => {
     status: "pending",
   });
 
+  await paymentRef.set(paymentData);
+
   return session.url;
 };
 
 const fulfillPayment = async (session) => {
-  const payment = await Payment.findOne({ stripeSessionId: session.id });
-  if (!payment || payment.status === "paid") return;
+  const snapshot = await db.collection("payments")
+    .where("stripeSessionId", "==", session.id)
+    .limit(1)
+    .get();
 
-  payment.status = "paid";
-  await payment.save();
+  if (snapshot.empty) return null;
 
-  await User.findByIdAndUpdate(payment.userId, { $inc: { credits: payment.credits } });
+  const paymentDoc = snapshot.docs[0];
+  const paymentData = paymentDoc.data();
+
+  // Skip if already fulfilled, BUT return the credits so the frontend knows what happened
+  if (paymentData.status === "paid") {
+    return { credits: paymentData.credits, alreadyPaid: true };
+  }
+
+  // Update payment status to paid
+  await paymentDoc.ref.update({
+    status: "paid",
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+
+  // Atomically increment user credits
+  const userRef = db.collection("users").doc(paymentData.userId);
+  await userRef.update({
+    credits: admin.firestore.FieldValue.increment(paymentData.credits),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+
+  // 🔥 FIXED: Return the credits so the controller can pass them to the frontend
+  return { credits: paymentData.credits, alreadyPaid: false };
 };
 
 export default {

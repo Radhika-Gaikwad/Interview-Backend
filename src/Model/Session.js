@@ -1,69 +1,54 @@
-import mongoose from "mongoose";
+import admin from "firebase-admin";
 
-const SessionSchema = new mongoose.Schema(
-  {
-    title: String,
-    company: String,
-    jobDescription: String,
-    position: String,
-    skills: [{ type: String }],
-    location: String,
-    timezone: String,
-    scheduledAt: Date,
-    meetingLink: String,
+export const formatSessionData = (data) => {
+  // Helper to safely convert JS Dates or Strings to Firestore Timestamps
+  const parseDate = (val) => {
+    if (!val) return null;
+    if (val instanceof admin.firestore.Timestamp) return val;
+    return admin.firestore.Timestamp.fromDate(new Date(val));
+  };
 
-    resumeId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Resume",
-    },
+  return {
+    title: data.title || "",
+    company: data.company || "",
+    jobDescription: data.jobDescription || "",
+    position: data.position || "",
+    skills: Array.isArray(data.skills) ? data.skills : [],
+    location: data.location || "",
+    timezone: data.timezone || "",
+    scheduledAt: parseDate(data.scheduledAt),
+    meetingLink: data.meetingLink || "",
 
-    selectedResumeName: String,
+    resumeId: data.resumeId || null,
+    selectedResumeName: data.selectedResumeName || "",
+    owner: data.owner, // User ID
 
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true, // ✅ single index
-    },
+    language: data.language || "English",
+    aiModel: data.aiModel || "",
+    simpleEnglish: data.simpleEnglish || false,
+    extraContext: data.extraContext || "",
+    saveTranscript: data.saveTranscript || false,
+    shareAudio: data.shareAudio || false,
+    connectionMethod: data.connectionMethod || "",
+    autoExtend: data.autoExtend !== undefined ? data.autoExtend : true,
+    trial: data.trial || false,
 
-    language: { type: String, default: "English" },
-    aiModel: String,
-    simpleEnglish: { type: Boolean, default: false },
-    extraContext: String,
-    saveTranscript: { type: Boolean, default: false },
-    shareAudio: { type: Boolean, default: false },
-    connectionMethod: String,
-    autoExtend: { type: Boolean, default: true },
-    trial: { type: Boolean, default: false },
+    creditsUsed: data.creditsUsed || 0,
+    durationMinutes: data.durationMinutes || 30,
+    actualDurationMinutes: data.actualDurationMinutes || null,
 
-    creditsUsed: { type: Number, default: 0 },
-    durationMinutes: { type: Number, default: 30 },
-    actualDurationMinutes: Number,
+    status: data.status || "draft",
+    startAt: parseDate(data.startAt),
+    endAt: parseDate(data.endAt),
 
-    status: {
-      type: String,
-      enum: ["draft","scheduled","active","completed","cancelled","expired"],
-      default: "draft",
-      index: true, // ✅ useful filter index
-    },
+    participants: Array.isArray(data.participants) ? data.participants : [],
+    
+    createdAt: data.createdAt || admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+};
 
-    startAt: Date,
-    endAt: Date,
-
-    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  },
-  { timestamps: true }
-);
-
-/* ================= COMPOUND INDEXES (CRITICAL) ================= */
-
-// 🔥 MOST IMPORTANT (your main query)
-SessionSchema.index({ owner: 1, createdAt: -1 });
-
-// 🔥 for filtering by status + owner
-SessionSchema.index({ owner: 1, status: 1 });
-
-// 🔥 optional (if you query scheduled sessions)
-SessionSchema.index({ owner: 1, scheduledAt: 1 });
-
-export default mongoose.model("Session", SessionSchema);
+export const mapSessionDoc = (doc) => {
+  if (!doc.exists) return null;
+  return { _id: doc.id, ...doc.data() };
+};

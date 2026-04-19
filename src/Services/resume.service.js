@@ -1,53 +1,67 @@
-import Resume from "../Model/Resume.js";
+import admin from "firebase-admin";
+import db from "../config/db.js";
+import { formatResumeData, mapResumeDoc } from "../Model/Resume.js";
 import { bucket } from "../utils/gcs.js";
 
-
 const BASE_URL = process.env.BACKEND_URL;
-// create resume
+
+// ================= CREATE RESUME =================
 export const createResume = async (data) => {
   // Determine version for the same user & same title
-  const lastResume = await Resume.findOne({
-    user: data.user,
-    title: data.title
-  })
-    .sort({ version: -1 })
-    .select("version")
-    .lean();
+  const snapshot = await db.collection("resumes")
+    .where("user", "==", data.user)
+    .where("title", "==", data.title)
+    .orderBy("version", "desc")
+    .limit(1)
+    .get();
 
-  const lastVersion = Number(lastResume?.version || 0);
+  let lastVersion = 0;
+  if (!snapshot.empty) {
+    lastVersion = Number(snapshot.docs[0].data().version || 0);
+  }
+
   const version = lastVersion + 1;
 
-  const resumeDoc = await Resume.create({ ...data, version });
-  return resumeDoc;
+  // Generate new document reference
+  const resumeRef = db.collection("resumes").doc();
+  const resumeData = formatResumeData({ ...data, version });
+
+  // Save to Firestore
+  await resumeRef.set(resumeData);
+
+  return { _id: resumeRef.id, ...resumeData };
 };
 
-// list resumes for a user
 export const getResumes = async (userId, page = 1, limit = 6) => {
   if (!userId) throw new Error("User ID missing");
 
   const skip = (page - 1) * limit;
+  
+  // 1. Get Total Count (Using the new optimized count() method)
+  const countSnapshot = await db.collection("resumes")
+    .where("user", "==", userId)
+    .where("isDeleted", "==", false)
+    .count()
+    .get();
+  
+  const total = countSnapshot.data().count;
 
-  const [resumes, total] = await Promise.all([
-    Resume.find({
-      user: userId,
-      isDeleted: false,
-    })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(),
+  // 2. Fetch only the slice for the current page
+  const snapshot = await db.collection("resumes")
+    .where("user", "==", userId)
+    .where("isDeleted", "==", false)
+    .orderBy("createdAt", "desc")
+    .offset(skip)
+    .limit(limit)
+    .get();
 
-    Resume.countDocuments({
-      user: userId,
-      isDeleted: false,
-    }),
-  ]);
+  const resumes = snapshot.docs.map(mapResumeDoc);
 
   const formatted = resumes.map((r) => ({
     ...r,
     title: `${r.title} (v${r.version})`,
-   previewUrl: `${BASE_URL}/api/resume/view/${r._id}`,
-downloadUrl: `${BASE_URL}/api/resume/download/${r._id}`,
+    previewUrl: `${BASE_URL}/api/resume/view/${r._id}`,
+    downloadUrl: `${BASE_URL}/api/resume/download/${r._id}`,
   }));
 
   return {
@@ -58,38 +72,49 @@ downloadUrl: `${BASE_URL}/api/resume/download/${r._id}`,
   };
 };
 
+// ================= SOFT DELETE RESUME =================
 export const deleteResume = async (resumeId, userId) => {
   if (!resumeId || !userId) {
     throw new Error("Resume ID & User ID are required");
   }
 
-  const resume = await Resume.findOne({
-    _id: resumeId,
-    user: userId,
-    isDeleted: false
-  });
+  const resumeRef = db.collection("resumes").doc(resumeId);
+  const doc = await resumeRef.get();
 
-  if (!resume) {
+  // Verify document exists, belongs to user, and isn't already deleted
+  if (!doc.exists || doc.data().user !== userId || doc.data().isDeleted) {
     throw new Error("Resume not found or already deleted");
   }
 
-  console.log("🗑 Soft deleting resume:", resume._id);
+  console.log("🗑 Soft deleting resume:", doc.id);
 
-  resume.isDeleted = true;
-  resume.deletedAt = new Date();
-  resume.isDefault = false;
+  // Soft delete using FieldValue timestamps
+  await resumeRef.update({
+    isDeleted: true,
+    deletedAt: admin.firestore.FieldValue.serverTimestamp(),
+    isDefault: false,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
 
-  await resume.save();
+  // Ensure user still has a default resume
+  const anotherSnapshot = await db.collection("resumes")
+    .where("user", "==", userId)
+    .where("isDeleted", "==", false)
+    .get();
 
-  // ensure user still has a default resume
-  const anotherResume = await Resume.findOne({
-    user: userId,
-    isDeleted: false
-  }).sort({ createdAt: -1 });
+  if (!anotherSnapshot.empty) {
+    // 🔥 FIXED: Sorted in JS to bypass the hidden index requirement here
+    const sortedDocs = anotherSnapshot.docs.sort((a, b) => {
+      const timeA = a.data().createdAt?.toMillis() || 0;
+      const timeB = b.data().createdAt?.toMillis() || 0;
+      return timeB - timeA;
+    });
 
-  if (anotherResume) {
-    anotherResume.isDefault = true;
-    await anotherResume.save();
+    const anotherDocRef = sortedDocs[0].ref;
+    await anotherDocRef.update({
+      isDefault: true,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
   }
 
   console.log("✅ Resume soft deleted");

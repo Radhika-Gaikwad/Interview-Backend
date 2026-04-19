@@ -8,7 +8,12 @@ import crypto from "crypto";
 import { bucket } from "../utils/gcs.js";
 import textUtils from "../utils/textUtils.js";
 import { parseResumeWithGemini } from "../utils/geminiResumeParser.js";
-import Resume from "../Model/Resume.js";
+
+// 👇 FIREBASE IMPORTS
+import { formatResumeData } from "../Model/Resume.js";
+import db from "../config/db.js";
+import admin from "firebase-admin";
+
 import auth from "../middleware/auth.middleware.js";
 import libre from "libreoffice-convert";
 import util from "util";
@@ -50,16 +55,37 @@ router.post("/upload-resume", auth, upload.single("resume"), async (req, res) =>
     console.log(`[${requestId}] 🚀 Upload started for user ${userId}`);
 
     /* ===============================
-       STEP 1: Determine version
+       STEP 1: Determine version (INDEX BYPASS IN JAVASCRIPT)
     =============================== */
     const t1 = Date.now();
 
-    const lastResume = await Resume.findOne({ user: userId, title })
-      .sort({ version: -1 })
-      .select("version")
-      .lean();
+    // Fetch ALL resumes for this user (only uses 1 basic index, which is allowed)
+    const userResumesSnapshot = await db.collection("resumes")
+      .where("user", "==", userId)
+      .get();
 
-    const version = Number(lastResume?.version || 0) + 1;
+    let lastVersion = 0;
+    const targetTitle = title || file.originalname;
+
+    if (!userResumesSnapshot.empty) {
+      // Filter by title in JavaScript to avoid composite index error
+      const matchingResumes = userResumesSnapshot.docs.filter(
+        (doc) => doc.data().title === targetTitle
+      );
+
+      if (matchingResumes.length > 0) {
+        // Sort descending by version in JavaScript
+        matchingResumes.sort((a, b) => {
+          const versionA = Number(a.data().version || 0);
+          const versionB = Number(b.data().version || 0);
+          return versionB - versionA;
+        });
+
+        lastVersion = Number(matchingResumes[0].data().version || 0);
+      }
+    }
+
+    const version = lastVersion + 1;
 
     logStep("STEP 1", `Version determined: v${version}`);
     logTime("STEP 1 duration", t1);
@@ -132,9 +158,6 @@ router.post("/upload-resume", auth, upload.single("resume"), async (req, res) =>
     const debugPath = path.join(os.tmpdir(), `DEBUG_${baseName}.txt`);
     await fs.writeFile(debugPath, extractedText);
 
-    console.log("========== EXTRACTED TEXT SENT TO GEMINI ==========");
-    console.log(extractedText);
-    console.log("====================================================");
     logStep("STEP 3", `Text extracted (${extractedText.length} chars)`);
     logTime("STEP 3 duration", t3);
 
@@ -185,32 +208,54 @@ router.post("/upload-resume", auth, upload.single("resume"), async (req, res) =>
     logTime("STEP 5 duration", t5);
 
     /* ===============================
-       STEP 6: Update default resume
+       STEP 6: Update default resume (INDEX BYPASS IN JAVASCRIPT)
     =============================== */
     const t6 = Date.now();
 
-    await Resume.updateMany({ user: userId }, { isDefault: false });
+    if (!userResumesSnapshot.empty) {
+      // Filter by isDefault in JavaScript to avoid composite index error
+      const defaultDocs = userResumesSnapshot.docs.filter(
+        (doc) => doc.data().isDefault === true
+      );
+
+      if (defaultDocs.length > 0) {
+        const batch = db.batch();
+        defaultDocs.forEach((doc) => {
+          batch.update(doc.ref, {
+            isDefault: false,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+        });
+        await batch.commit();
+      }
+    }
 
     logStep("STEP 6", "Previous resumes marked non-default");
     logTime("STEP 6 duration", t6);
 
     /* ===============================
-       STEP 7: Save to DB
+       STEP 7: Save to DB (FIREBASE WAY)
     =============================== */
     const t7 = Date.now();
 
-    const resumeDoc = await Resume.create({
+    const resumeRef = db.collection("resumes").doc();
+    const resumeData = formatResumeData({
       user: userId,
       email,
       title: title || file.originalname,
       version,
       resumePath,
-      previewPdfPath,   // ✅ ADD THIS
+      previewPdfPath,
       textPath,
       jsonPath,
       parsedData,
       isDefault: true,
     });
+
+    await resumeRef.set(resumeData);
+
+    // Create an object that mimics Mongoose's response for the frontend
+    const resumeDoc = { _id: resumeRef.id, ...resumeData };
 
     logStep("STEP 7", `Resume saved with ID ${resumeDoc._id}`);
     logTime("STEP 7 duration", t7);
@@ -231,10 +276,9 @@ router.post("/upload-resume", auth, upload.single("resume"), async (req, res) =>
       message: "Resume uploaded & processed successfully",
       resume: {
         _id: resumeDoc._id,
-        title: displayTitle,   // ✅ user-friendly title
-        originalTitle: resumeDoc.title, // optional (useful for editing)
+        title: displayTitle,
+        originalTitle: resumeDoc.title,
         version: resumeDoc.version,
-
         isDefault: resumeDoc.isDefault,
         previewUrl: `${BASE_URL}/api/resume/view/${resumeDoc._id}`,
         downloadUrl: `${BASE_URL}/api/resume/download/${resumeDoc._id}`,
