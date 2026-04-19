@@ -36,26 +36,25 @@ export const getResumes = async (userId, page = 1, limit = 6) => {
   if (!userId) throw new Error("User ID missing");
 
   const skip = (page - 1) * limit;
-  
-  // 1. Get Total Count (Using the new optimized count() method)
-  const countSnapshot = await db.collection("resumes")
-    .where("user", "==", userId)
-    .where("isDeleted", "==", false)
-    .count()
-    .get();
-  
+
+  // Use parallel execution for count and data fetch to save time
+  const [countSnapshot, dataSnapshot] = await Promise.all([
+    db.collection("resumes")
+      .where("user", "==", userId)
+      .where("isDeleted", "==", false)
+      .count()
+      .get(),
+    db.collection("resumes")
+      .where("user", "==", userId)
+      .where("isDeleted", "==", false)
+      .orderBy("createdAt", "desc")
+      .offset(skip)
+      .limit(limit)
+      .get()
+  ]);
+
   const total = countSnapshot.data().count;
-
-  // 2. Fetch only the slice for the current page
-  const snapshot = await db.collection("resumes")
-    .where("user", "==", userId)
-    .where("isDeleted", "==", false)
-    .orderBy("createdAt", "desc")
-    .offset(skip)
-    .limit(limit)
-    .get();
-
-  const resumes = snapshot.docs.map(mapResumeDoc);
+  const resumes = dataSnapshot.docs.map(mapResumeDoc);
 
   const formatted = resumes.map((r) => ({
     ...r,

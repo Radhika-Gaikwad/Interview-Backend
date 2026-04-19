@@ -23,14 +23,16 @@ export const createResume = async (req, res) => {
   }
 };
 
+/* ================= GET ALL (PAGINATED & CACHED) ================= */
+
 export const getResumes = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 6;
 
-    // 1. FAST CHECK: Get only the latest updated doc to generate ETag
-    // This avoids downloading all IDs and timestamps for every request.
+    // 1. LIGHTWEIGHT HEADER CHECK
+    // Get only the most recently updated document's timestamp
     const latestDocSnapshot = await db.collection("resumes")
       .where("user", "==", userId)
       .where("isDeleted", "==", false)
@@ -39,34 +41,37 @@ export const getResumes = async (req, res) => {
       .get();
 
     let etag = `${userId}-${page}-${limit}-empty`;
+    
     if (!latestDocSnapshot.empty) {
       const lastUpdate = latestDocSnapshot.docs[0].data().updatedAt?.toMillis() || 0;
       etag = `${userId}-${page}-${limit}-${lastUpdate}`;
     }
 
-    // 2. Browser Cache Validation
+    // 2. Browser Cache Validation (304 Not Modified)
     if (req.headers["if-none-match"] === etag) {
       return res.status(304).end();
     }
 
-    // 3. Fetch only the data needed for this specific page
+    // 3. Only fetch full data if ETag doesn't match
     const result = await resumeService.getResumes(userId, page, limit);
 
+    // Set headers for next time
     res.set("ETag", etag);
-    res.set("Cache-Control", "private, max-age=120"); // Increased to 2 mins
+    res.set("Cache-Control", "private, max-age=60"); // Cache for 1 minute
     res.json(result);
   } catch (err) {
     console.error("Get resumes error:", err);
     res.status(500).json({ error: err.message });
   }
 };
-/* ================= VIEW (CACHEABLE - SHORT TTL) ================= */
+
+/* ================= VIEW (SIGNED URL CACHING) ================= */
 
 export const viewResume = async (req, res) => {
   try {
     const resumeId = req.params.id;
 
-    // ✅ FIREBASE WAY: Direct document read
+    // Direct document read from Firestore
     const doc = await db.collection("resumes").doc(resumeId).get();
 
     if (!doc.exists) {
@@ -74,25 +79,25 @@ export const viewResume = async (req, res) => {
     }
 
     const meta = doc.data();
-    const etag = meta.updatedAt ? meta.updatedAt.toDate().toISOString() : "new";
+    // Generate ETag based on the last update time
+    const etag = meta.updatedAt ? meta.updatedAt.toDate().getTime().toString() : "initial";
 
-    // ✅ RETURN EARLY (NO GCS CALL)
+    // ✅ SHIELD: If document hasn't changed, don't generate a new Signed URL
     if (req.headers["if-none-match"] === etag) {
-      return res.status(304).end(); // ⚡ HUGE SAVING
+      return res.status(304).end(); 
     }
 
-    // ❗ Only now generate signed URL
     const filePath = meta.previewPdfPath || meta.resumePath;
     const file = bucket.file(filePath);
 
+    // Signed URLs are expensive to generate; only do it if necessary
     const [url] = await file.getSignedUrl({
       action: "read",
-      expires: Date.now() + 15 * 60 * 1000,
+      expires: Date.now() + 15 * 60 * 1000, // 15 mins
     });
 
     res.set("ETag", etag);
-    res.set("Cache-Control", "private, max-age=60");
-
+    res.set("Cache-Control", "private, max-age=300"); // Cache view for 5 mins
     return res.json({ url });
 
   } catch (err) {
@@ -100,8 +105,6 @@ export const viewResume = async (req, res) => {
     res.status(500).json({ error: "Preview failed" });
   }
 };
-
-/* ================= DOWNLOAD (NO CACHE) ================= */
 
 export const downloadResume = async (req, res) => {
   try {
