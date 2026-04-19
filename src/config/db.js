@@ -1,27 +1,22 @@
 import admin from "firebase-admin";
 import { getFirestore } from "firebase-admin/firestore";
-import { getStorage } from "firebase-admin/storage"; // Import Storage for buckets
-import fs from "fs";
+import { getStorage } from "firebase-admin/storage";
 
-const serviceAccount = JSON.parse(
-  fs.readFileSync(new URL("./gcs-key.json", import.meta.url))
-);
+// Parse the GCS_KEY environment variable (which should be the full JSON string)
+const serviceAccount = JSON.parse(process.env.GCS_KEY);
 
-// Prevent re-initializing if the app is already running
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    // Optional: You can set the default bucket globally here
-    // storageBucket: "answerflow-ai" (or "answerflow-ai.appspot.com")
+    // Use the environment variable for the bucket name
+    storageBucket: process.env.GCS_BUCKET
   });
 }
 
-// 1. Initialize Firestore Database
 const db = getFirestore();
 
-// 2. Initialize the specific Cloud Storage Bucket
-const bucket = getStorage().bucket("answerflow-ai");
+// Use the environment variable here as well
+const bucket = getStorage().bucket(process.env.GCS_BUCKET);
 
-// Export db as default for backwards compatibility, and explicitly export both
 export { db, bucket };
 export default db;
